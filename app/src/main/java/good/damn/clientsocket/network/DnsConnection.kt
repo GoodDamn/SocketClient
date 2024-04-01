@@ -5,6 +5,8 @@ import android.os.Looper
 import android.util.Log
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.NetworkUtils
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.Inet4Address
@@ -34,27 +36,49 @@ class DnsConnection(
     ) {
 
         Thread {
-            val baDomain = domain
-                .toByteArray(mCharset)
 
             val socket = DatagramSocket()
 
-            val request = byteArrayOf(
+            /*val request = byteArrayOf(
                 0,15, // 2b - ID
                 0,0, // 16(-bit) flags
                 0,0, // 2b - Number of questions
                 0,0, // 2b - number of answers
                 0,0, // 2b - number of authority RRs
                 0,0  // 2b - number of additional RRs
-            )
+            )*/
+
+            val baos = ByteArrayOutputStream()
+            val dos = DataOutputStream(baos)
 
             val toAddress = InetAddress
                 .getByName(mHost)
 
+            dos.writeShort(0x0015) // ID
+            dos.writeShort(0x0100) // Flags
+            dos.writeShort(0x0001) // Number of questions
+            dos.writeShort(0x0000) // number of answers
+            dos.writeShort(0x0000) // number of authority RRs
+            dos.writeShort(0x0000) // number of additional RRs
+
+            val domainParts = domain.split("\\.")
+            Log.d(TAG, "connect: DOMAIN $domain WITH ${domainParts.size} portions")
+            for (part in domainParts) {
+                dos.write(part.length)
+                dos.write(part.toByteArray(mCharset)) // UTF-8
+            }
+
+            dos.writeByte(0x00) // No more parts
+            dos.writeShort(0x0001) // Host request (Type = A)
+            dos.writeShort(0x0001) // Class 0x01 = IN
+
+            val requestBytes = baos.toByteArray()
+            baos.close()
+
             val packet = DatagramPacket(
-                request,
+                requestBytes,
                 0,
-                request.size,
+                requestBytes.size,
                 toAddress,
                 53 // DNS-port
             )
@@ -63,7 +87,7 @@ class DnsConnection(
 
             socket.send(packet)
 
-            val receiveBuffer = ByteArray(4096)
+            val receiveBuffer = ByteArray(512)
 
             val receivePacket = DatagramPacket(
                 receiveBuffer,
@@ -76,7 +100,7 @@ class DnsConnection(
                 receivePacket
             )
 
-            Log.d(TAG, "connect: UDP-DNS RECEIVED: PROCESSING")
+            Log.d(TAG, "connect: UDP-DNS RECEIVED: PROCESSING ${receiveBuffer.contentToString()}")
 
             val flag1 = Integer.toBinaryString(
                 receiveBuffer[2].toInt()
@@ -86,6 +110,8 @@ class DnsConnection(
             ).substring(24)
 
             Log.d(TAG, "connect: UDP-DNS FLAGS: $flag1 $flag2")
+
+
 
             mainThread.run {
 
