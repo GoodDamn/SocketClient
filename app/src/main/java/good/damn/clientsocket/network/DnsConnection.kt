@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.io.EOFException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.Inet4Address
@@ -89,7 +90,7 @@ class DnsConnection(
 
             socket.send(packet)
 
-            val receiveBuffer = ByteArray(512)
+            val receiveBuffer = ByteArray(1024)
 
             val receivePacket = DatagramPacket(
                 receiveBuffer,
@@ -119,41 +120,69 @@ class DnsConnection(
             val auth = inp.readShort()
             val additional = inp.readShort()
 
-            var response = ""
+            var records = ""
 
-            var recordLen = 1
-            while(recordLen > 0) {
+            var recordLen: Byte
+            while(true) {
                 recordLen = inp.readByte()
-                    .toInt()
 
-                val recBytes = ByteArray(recordLen)
+                if (recordLen <= 0) {
+                    break
+                }
+
+                val recBytes = ByteArray(recordLen.toInt())
                 inp.read(recBytes)
 
-                response += "RECORD: ${String(recBytes,mCharset)}\n"
+                records += "RECORD: ${String(recBytes,mCharset)}\n"
             }
 
             val recordType = inp.readShort()
             val classs = inp.readShort()
+
             val field = inp.readShort()
             val type = inp.readShort()
             val classType = inp.readShort()
-            val ttl = inp.readShort()
+            val ttl = inp.readInt()
 
             val addressLen = inp.readShort()
 
             var addressString = ""
 
-
+            Log.d(TAG, "connect: ADDRESS_LEN: $addressLen")
+            
             for (i in 0 until addressLen) {
-                addressString += "${inp.readByte().toInt() and 0xff}"
+                try {
+                    addressString += "${inp.readByte().toInt() and 0xff}."
+                } catch (ex: java.lang.Exception) {
+                    Log.d(TAG, "connect: EXCEPTION: $ex")
+                    break
+                }
             }
 
+            inp.close()
+            
             val responseDNS = """
-                
+                REQUEST_ID: $requestID
+                FLAGS: ${Integer.toBinaryString(flags).substring(16)}
+                QUESTIONS: $questions
+                ANSWERS: $answers
+                AUTHORITY: $auth
+                ADDITIONAL: $additional
+                $records
+                RECORD_TYPE: $recordType
+                CLASS: $classs
+                FIELD: $field
+                TYPE: $type
+                CLASS_TYPE: $classType
+                TIME TO LIVE: $ttl
+                IPv4: $addressString
             """.trimIndent()
-
+            
             mainThread.run {
-                onGetDomainIPPort()
+                onGetDomainIPPort(
+                    responseDNS,
+                    0
+                )
             }
 
             Thread.currentThread()

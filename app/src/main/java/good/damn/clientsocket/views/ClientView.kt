@@ -114,8 +114,9 @@ class ClientView(
                 mEditTextHost.text.toString(),
                 53)
             dns.connect(mEditTextHost.text.toString()) {
-                ipHost, port ->
-                connectToHost(ipHost, port, buffer)
+                msg, port ->
+                msgr.addMessage(msg)
+                //connectToHost(ipHost, port, buffer)
             }
         }
 
