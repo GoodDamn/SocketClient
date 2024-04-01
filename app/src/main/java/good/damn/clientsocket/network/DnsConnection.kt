@@ -64,7 +64,7 @@ class DnsConnection(
             dos.writeShort(0x0000) // number of authority RRs
             dos.writeShort(0x0000) // number of additional RRs
 
-            val domainParts = domain.split("\\.")
+            val domainParts = domain.split("\\.".toRegex())
             Log.d(TAG, "connect: DOMAIN $domain WITH ${domainParts.size} portions")
             for (part in domainParts) {
                 dos.write(part.length)
@@ -133,7 +133,7 @@ class DnsConnection(
                 val recBytes = ByteArray(recordLen.toInt())
                 inp.read(recBytes)
 
-                records += "RECORD: ${String(recBytes,mCharset)}\n"
+                records += "\nRECORD: ${String(recBytes,mCharset)}"
             }
 
             val recordType = inp.readShort()
@@ -153,7 +153,7 @@ class DnsConnection(
             for (i in 0 until addressLen) {
                 try {
                     addressString += "${inp.readByte().toInt() and 0xff}."
-                } catch (ex: java.lang.Exception) {
+                } catch (ex: EOFException) {
                     Log.d(TAG, "connect: EXCEPTION: $ex")
                     break
                 }

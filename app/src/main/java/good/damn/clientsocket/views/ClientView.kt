@@ -113,7 +113,7 @@ class ClientView(
             val dns = DnsConnection(
                 mEditTextHost.text.toString(),
                 53)
-            dns.connect(mEditTextHost.text.toString()) {
+            dns.connect(mEditTextMsg.text.toString()) {
                 msg, port ->
                 msgr.addMessage(msg)
                 //connectToHost(ipHost, port, buffer)
