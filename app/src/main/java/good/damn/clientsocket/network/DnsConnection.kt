@@ -5,7 +5,9 @@ import android.os.Looper
 import android.util.Log
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.NetworkUtils
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -102,19 +104,56 @@ class DnsConnection(
 
             Log.d(TAG, "connect: UDP-DNS RECEIVED: PROCESSING ${receiveBuffer.contentToString()}")
 
-            val flag1 = Integer.toBinaryString(
-                receiveBuffer[2].toInt()
-            ).substring(24)
-            val flag2 = Integer.toBinaryString(
-                receiveBuffer[3].toInt()
-            ).substring(24)
+            val inp = DataInputStream(
+                ByteArrayInputStream(
+                    receiveBuffer
+                )
+            )
 
-            Log.d(TAG, "connect: UDP-DNS FLAGS: $flag1 $flag2")
+            val requestID = inp.readShort()
+            val flags = inp.readShort()
+                .toInt()
+
+            val questions = inp.readShort()
+            val answers = inp.readShort()
+            val auth = inp.readShort()
+            val additional = inp.readShort()
+
+            var response = ""
+
+            var recordLen = 1
+            while(recordLen > 0) {
+                recordLen = inp.readByte()
+                    .toInt()
+
+                val recBytes = ByteArray(recordLen)
+                inp.read(recBytes)
+
+                response += "RECORD: ${String(recBytes,mCharset)}\n"
+            }
+
+            val recordType = inp.readShort()
+            val classs = inp.readShort()
+            val field = inp.readShort()
+            val type = inp.readShort()
+            val classType = inp.readShort()
+            val ttl = inp.readShort()
+
+            val addressLen = inp.readShort()
+
+            var addressString = ""
 
 
+            for (i in 0 until addressLen) {
+                addressString += "${inp.readByte().toInt() and 0xff}"
+            }
+
+            val responseDNS = """
+                
+            """.trimIndent()
 
             mainThread.run {
-
+                onGetDomainIPPort()
             }
 
             Thread.currentThread()
