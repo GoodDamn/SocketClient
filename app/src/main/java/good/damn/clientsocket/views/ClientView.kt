@@ -35,13 +35,14 @@ class ClientView(
     private val TAG = "ClientView"
 
     private val msgr = Messenger()
-    private var mEditTextDns: EditText
     private var mEditTextHost: EditText
     private var mEditTextMsg: EditText
 
     private var mResponseType: Int = 1 // file
     private var mResponse = byteArrayOf(48)
     private var mResponseText = byteArrayOf(48)
+
+    private val mBuffer = ByteArray(1024*1024)
 
     init {
         val contentLauncher = ContentLauncher(activity) {
@@ -83,9 +84,6 @@ class ClientView(
 
         }
 
-        mEditTextDns = EditText(context)
-        mEditTextDns.hint = "DNS IP"
-
         mEditTextHost = EditText(context)
         mEditTextHost.hint = "Enter host domain"
 
@@ -94,6 +92,11 @@ class ClientView(
 
         val btnConnect = Button(context)
         btnConnect.text = "Connect to host"
+
+        val btnConnectDns = Button(
+            context
+        )
+        btnConnectDns.text = "Connect to DNS server"
 
         val btnSelectFile = Button(context)
         btnSelectFile.text = "Select file for response"
@@ -107,17 +110,23 @@ class ClientView(
 
         msgr.setTextView(textViewMsg)
 
-        val buffer = ByteArray(1024*1024)
-
-        btnConnect.setOnClickListener {
+        btnConnectDns.setOnClickListener {
             val dns = DnsConnection(
                 mEditTextHost.text.toString(),
                 53)
-            dns.connect(mEditTextMsg.text.toString()) {
-                msg, port ->
+            dns.connect(
+                mEditTextMsg.text.toString()
+            ) { msg, _ ->
                 msgr.addMessage(msg)
-                //connectToHost(ipHost, port, buffer)
             }
+        }
+
+        btnConnect.setOnClickListener {
+            connectToHost(
+                mEditTextHost.text.toString(),
+                80,
+                mBuffer
+            )
         }
 
         btnSelectFile.setOnClickListener {
@@ -158,6 +167,7 @@ class ClientView(
         addView(btnSelectFile, -1, -2)
         addView(mEditTextMsg, -1,-2)
         addView(btnConnect, -1, -2)
+        addView(btnConnectDns, -1,-2)
         addView(textViewMsg, -1, -2)
 
         getHotspotIP {

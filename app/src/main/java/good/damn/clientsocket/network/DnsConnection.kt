@@ -39,17 +39,7 @@ class DnsConnection(
     ) {
 
         Thread {
-
             val socket = DatagramSocket()
-
-            /*val request = byteArrayOf(
-                0,15, // 2b - ID
-                0,0, // 16(-bit) flags
-                0,0, // 2b - Number of questions
-                0,0, // 2b - number of answers
-                0,0, // 2b - number of authority RRs
-                0,0  // 2b - number of additional RRs
-            )*/
 
             val baos = ByteArrayOutputStream()
             val dos = DataOutputStream(baos)
@@ -71,9 +61,15 @@ class DnsConnection(
                 dos.write(part.toByteArray(mCharset)) // UTF-8
             }
 
-            dos.writeByte(0x00) // No more parts
-            dos.writeShort(0x0001) // Host request (Type = A)
-            dos.writeShort(0x0001) // Class 0x01 = IN
+            dos.writeByte(
+                0x00 // No more parts
+            )
+            dos.writeShort(
+                0x0001  // Host request (Type = A)
+            )
+            dos.writeShort(
+                0x0001  // Class 0x01 = IN
+            )
 
             val requestBytes = baos.toByteArray()
             baos.close()
@@ -88,7 +84,9 @@ class DnsConnection(
 
             Log.d(TAG, "connect: UDP send ${toAddress.hostName} $mHost")
 
-            socket.send(packet)
+            socket.send(
+                packet
+            )
 
             val receiveBuffer = ByteArray(1024)
 
