@@ -124,7 +124,7 @@ class ClientView(
         btnConnect.setOnClickListener {
             connectToHost(
                 mEditTextHost.text.toString(),
-                80,
+                8080,
                 mBuffer
             )
         }
