@@ -3,11 +3,13 @@ package good.damn.clientsocket.activities
 import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.allViews
 import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.utils.FileUtils
@@ -17,7 +19,6 @@ class IPPortActivity
     : AppCompatActivity(),
     ClientViewListener,
     ActivityResultCallback<Uri?> {
-
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -55,12 +56,13 @@ class IPPortActivity
             contentLauncher.launch("*/*")
         }
 
+        btnSelectFile.layoutParams = ViewGroup
+            .LayoutParams(-1,-2)
+
         clientView.addView(
             btnSelectFile,
-            -1,
-            -2
+            clientView.childCount - 2 // before messenger
         )
-
     }
 
     override fun onActivityResult(
