@@ -3,7 +3,7 @@ package good.damn.clientsocket.services.network
 import android.content.Context
 import android.net.*
 import androidx.annotation.RequiresApi
-import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
+import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.services.BaseService
 
 @RequiresApi(30)

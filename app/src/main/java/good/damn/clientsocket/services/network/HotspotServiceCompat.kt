@@ -2,7 +2,7 @@ package good.damn.clientsocket.services.network
 
 import android.content.Context
 import android.os.Build
-import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
+import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.services.BaseService
 
 class HotspotServiceCompat(

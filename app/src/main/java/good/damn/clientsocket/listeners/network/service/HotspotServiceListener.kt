@@ -1,4 +1,4 @@
-package good.damn.clientsocket.listeners.service.network
+package good.damn.clientsocket.listeners.network.service
 
 interface HotspotServiceListener {
 

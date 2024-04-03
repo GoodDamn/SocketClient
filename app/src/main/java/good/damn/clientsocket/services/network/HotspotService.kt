@@ -3,11 +3,9 @@ package good.damn.clientsocket.services.network
 import android.content.Context
 import android.net.*
 import android.net.wifi.WifiManager
-import android.util.Log
-import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
+import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.services.BaseService
 import good.damn.clientsocket.utils.ByteUtils
-import java.net.InetAddress
 import java.nio.ByteOrder
 
 @Deprecated("dhcpInfo of WifiManager class is deprecated")

@@ -1,16 +1,8 @@
 package good.damn.clientsocket.views
 
-import android.content.Context
-import android.content.Context.CONNECTIVITY_SERVICE
-import android.content.Context.WIFI_SERVICE
-import android.net.*
-import android.net.ConnectivityManager.NetworkCallback
-import android.net.wifi.WifiManager
-import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.Gravity
 import android.widget.*
 import androidx.annotation.WorkerThread
@@ -18,15 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.network.interfaces.Connectable
 import good.damn.clientsocket.ContentLauncher
-import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
+import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.DnsConnection
 import good.damn.clientsocket.services.network.HotspotServiceCompat
-import good.damn.clientsocket.utils.ByteUtils
-import java.net.InetAddress
 import java.net.Socket
-import java.nio.ByteOrder
 
 class ClientView(
     activity: AppCompatActivity
