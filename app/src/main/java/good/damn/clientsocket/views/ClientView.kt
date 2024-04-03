@@ -4,6 +4,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
+import android.view.View
 import android.widget.*
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.connection.Connectable
 import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
+import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.DnsConnection
@@ -22,74 +24,30 @@ class ClientView(
 ) : LinearLayout(activity),
     Connectable, HotspotServiceListener {
 
-    private val TAG = "ClientView"
-
     private val msgr = Messenger()
     private var mEditTextHost: EditText
     private var mEditTextMsg: EditText
 
-    private var mResponseType: Int = 1 // file
-    private var mResponse = byteArrayOf(48)
-    private var mResponseText = byteArrayOf(48)
-
     private val mHotspotService: HotspotServiceCompat
 
+    var delegate: ClientViewListener? = null
+
     init {
-        val contentLauncher = ContentLauncher(activity) {
-            uri ->
-
-            val data = FileUtils.read(uri,context)
-
-            if (data == null) {
-                Toast.makeText(
-                    context,
-                    "Something went wrong with file",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@ContentLauncher
-            }
-
-            val p = uri!!.path!!
-            val t = "primary:"
-            val filePath = p.substring(p.indexOf(t)+t.length)
-
-            val nameIndex = filePath.lastIndexOf("/")
-
-            val fileName = if (nameIndex == -1)
-                            filePath
-                           else filePath.substring(nameIndex+1)
-
-            mResponseText = fileName.toByteArray(
-                msgr.getCharset()
-            )
-
-            mResponse = data
-            mResponseType = 1
-
-            Toast.makeText(
-                context,
-                "FILE IS PREPARED $fileName",
-                Toast.LENGTH_SHORT)
-                .show()
-
-        }
-
         mEditTextHost = EditText(context)
-        mEditTextHost.hint = "Enter host domain"
-
         mEditTextMsg = EditText(context)
+
+        mHotspotService = HotspotServiceCompat(
+            context
+        )
+    }
+
+    fun createView() {
+
+        mEditTextHost.hint = "Enter host IP"
         mEditTextMsg.hint = "Message"
 
         val btnConnect = Button(context)
-        btnConnect.text = "Connect to host"
-
-        val btnConnectDns = Button(
-            context
-        )
-        btnConnectDns.text = "Connect to DNS server"
-
-        val btnSelectFile = Button(context)
-        btnSelectFile.text = "Select file for response"
+        btnConnect.text = "Connect"
 
         val textViewMsg = TextView(context)
         textViewMsg.text = "----"
@@ -98,71 +56,43 @@ class ClientView(
         textViewMsg.isVerticalScrollBarEnabled = true
         textViewMsg.isHorizontalScrollBarEnabled = false
 
-        msgr.setTextView(textViewMsg)
-
-        btnConnectDns.setOnClickListener {
-            val dns = DnsConnection(
-                mEditTextHost.text.toString()
-            )
-            dns.connect(
-                mEditTextMsg.text.toString()
-            ) { msg, _ ->
-                msgr.addMessage(msg)
-            }
-        }
-
-        btnConnect.setOnClickListener {
-            connectToHost(
-                mEditTextHost.text.toString(),
-                8080,
-                Application.BUFFER_MB
-            )
-        }
-
-        btnSelectFile.setOnClickListener {
-            contentLauncher.launch("*/*")
-        }
-
-        mEditTextMsg.addTextChangedListener(object: TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s == null) {
-                    return
-                }
-                mResponseText = s.toString().toByteArray(
-                    msgr.getCharset()
-                )
-
-                mResponse = byteArrayOf()
-                mResponseType = 2
-            }
-
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-        })
+        msgr.setTextView(
+            textViewMsg
+        )
 
         gravity = Gravity.CENTER
         orientation = VERTICAL
 
-        addView(mEditTextHost, -1, -2)
-        addView(btnSelectFile, -1, -2)
-        addView(mEditTextMsg, -1,-2)
-        addView(btnConnect, -1, -2)
-        addView(btnConnectDns, -1,-2)
-        addView(textViewMsg, -1, -2)
-
-        mHotspotService = HotspotServiceCompat(
-            context
+        addView(
+            mEditTextHost,
+            -1,
+            -2
         )
+
+        addView(
+            mEditTextMsg,
+            -1,
+            -2
+        )
+
+        addView(
+            btnConnect,
+            -1,
+            -2
+        )
+
+        addView(
+            textViewMsg,
+            -1,
+            -2
+        )
+
+        delegate?.onCreateClientView(
+            mEditTextHost,
+            mEditTextMsg,
+            btnConnect
+        )
+
         mHotspotService.delegate = this
         mHotspotService.start()
     }
@@ -174,17 +104,17 @@ class ClientView(
 
     @WorkerThread
     override fun onSendTextBytes(): ByteArray {
-        return mResponseText
+        return ByteArray(0)
     }
 
     @WorkerThread
     override fun onSendBytes(): ByteArray {
-        return mResponse
+        return ByteArray(0)
     }
 
     @WorkerThread
     override fun onSendTypeResponse(): Int {
-        return mResponseType // 1 - file; 2 - text
+        return 0 // 1 - file; 2 - text
     }
 
     @WorkerThread
@@ -221,5 +151,13 @@ class ClientView(
         mEditTextHost.setText(
             "${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}"
         )
+    }
+
+    final override fun addView(
+        child: View?,
+        width: Int,
+        height: Int
+    ) {
+        super.addView(child, width, height)
     }
 }
