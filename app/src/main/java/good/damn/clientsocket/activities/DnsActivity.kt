@@ -35,7 +35,8 @@ class DnsActivity
     override fun onCreateClientView(
         editHost: EditText,
         editMsg: EditText,
-        btnConnect: Button
+        btnConnect: Button,
+        clientView: ClientView
     ) {
         btnConnect.text = "Connect to DNS"
         editHost.hint = "DNS IP"

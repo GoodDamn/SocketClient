@@ -33,7 +33,8 @@ class IPPortActivity
     override fun onCreateClientView(
         editHost: EditText,
         editMsg: EditText,
-        btnConnect: Button
+        btnConnect: Button,
+        clientView: ClientView
     ) {
 
         val activity = this

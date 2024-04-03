@@ -90,7 +90,8 @@ class ClientView(
         delegate?.onCreateClientView(
             mEditTextHost,
             mEditTextMsg,
-            btnConnect
+            btnConnect,
+            this
         )
 
         mHotspotService.delegate = this
