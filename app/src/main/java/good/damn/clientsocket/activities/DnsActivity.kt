@@ -6,11 +6,14 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.listeners.view.ClientViewListener
+import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.views.ClientView
 
 class DnsActivity
     : AppCompatActivity(),
     ClientViewListener {
+
+    private val msgr = Messenger()
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -41,6 +44,10 @@ class DnsActivity
         btnConnect.text = "Connect to DNS"
         editHost.hint = "DNS IP"
         editMsg.hint = "Request domain (google.com, ...)"
+
+        btnConnect.setOnClickListener {
+
+        }
     }
 
 }

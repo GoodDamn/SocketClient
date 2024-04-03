@@ -22,9 +22,8 @@ import java.net.Socket
 class ClientView(
     activity: AppCompatActivity
 ) : LinearLayout(activity),
-    Connectable, HotspotServiceListener {
+    HotspotServiceListener {
 
-    private val msgr = Messenger()
     private var mEditTextHost: EditText
     private var mEditTextMsg: EditText
 
@@ -42,23 +41,19 @@ class ClientView(
     }
 
     fun createView() {
+        val btnConnect = Button(context)
+        val textViewMsg = TextView(context)
 
         mEditTextHost.hint = "Enter host IP"
         mEditTextMsg.hint = "Message"
 
-        val btnConnect = Button(context)
         btnConnect.text = "Connect"
 
-        val textViewMsg = TextView(context)
         textViewMsg.text = "----"
         textViewMsg.textSize = 18f
         textViewMsg.movementMethod = ScrollingMovementMethod()
         textViewMsg.isVerticalScrollBarEnabled = true
         textViewMsg.isHorizontalScrollBarEnabled = false
-
-        msgr.setTextView(
-            textViewMsg
-        )
 
         gravity = Gravity.CENTER
         orientation = VERTICAL
@@ -97,50 +92,6 @@ class ClientView(
         mHotspotService.delegate = this
         mHotspotService.start()
     }
-
-    @WorkerThread
-    override fun onConnected(socket: Socket) {
-        msgr.addMessage("Connected to ${socket.remoteSocketAddress}")
-    }
-
-    @WorkerThread
-    override fun onSendTextBytes(): ByteArray {
-        return ByteArray(0)
-    }
-
-    @WorkerThread
-    override fun onSendBytes(): ByteArray {
-        return ByteArray(0)
-    }
-
-    @WorkerThread
-    override fun onSendTypeResponse(): Int {
-        return 0 // 1 - file; 2 - text
-    }
-
-    @WorkerThread
-    override fun onGetFile(
-        data: ByteArray,
-        offset: Int,
-        fileName: String
-    ) {
-        val msg = FileUtils.writeToDoc(fileName, data, offset)
-
-        if (msg != null) {
-            msgr.addMessage("Non saved $fileName: $msg")
-            return
-        }
-
-        msgr.addMessage("$fileName is saved to Documents")
-    }
-
-    @WorkerThread
-    override fun onGetText(msg: String) {
-        msgr.addMessage(msg)
-    }
-
-    @WorkerThread
-    override fun onHttpGet() {}
 
     override fun onGetHotspotIP(
         ip: ByteArray

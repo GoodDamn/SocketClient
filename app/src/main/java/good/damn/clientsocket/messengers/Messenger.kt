@@ -3,12 +3,10 @@ package good.damn.clientsocket.messengers
 import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
+import good.damn.clientsocket.Application
 import java.nio.charset.Charset
 
 class Messenger {
-
-    private val mHandler = Handler(Looper.getMainLooper())
-    private val mCharset = Charset.forName("UTF-8")
 
     private var mTextView: TextView? = null
     private var mIndex = 0
@@ -19,7 +17,7 @@ class Messenger {
     ) {
         messages += "${mIndex++}) $text\n"
         mTextView?.let {
-            mHandler.post {
+            Application.ui {
                 it.text = messages
             }
         }
@@ -29,10 +27,6 @@ class Messenger {
         textView: TextView?
     ) {
         mTextView = textView
-    }
-
-    fun getCharset(): Charset {
-        return mCharset
     }
 
     fun getMessages(): String {

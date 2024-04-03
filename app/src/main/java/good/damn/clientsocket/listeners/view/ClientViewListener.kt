@@ -3,6 +3,7 @@ package good.damn.clientsocket.listeners.view
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.views.ClientView
 
 interface ClientViewListener {
