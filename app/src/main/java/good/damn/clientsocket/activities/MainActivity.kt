@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import good.damn.clientsocket.views.ClientView
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class MainActivity
     : AppCompatActivity() {
 
@@ -14,8 +13,8 @@ class MainActivity
         super.onCreate(savedInstanceState)
 
         mClientView = ClientView(
-            this,
-            this)
+            this
+        )
         setContentView(mClientView)
     }
 
