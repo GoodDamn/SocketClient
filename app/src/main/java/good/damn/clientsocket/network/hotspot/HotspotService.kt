@@ -9,6 +9,7 @@ import good.damn.clientsocket.utils.ByteUtils
 import java.net.InetAddress
 import java.nio.ByteOrder
 
+@Deprecated("dhcpInfo of WifiManager class is deprecated")
 class HotspotService(
     val context: Context
 ) {
@@ -17,31 +18,18 @@ class HotspotService(
         private const val TAG = "HotspotService"
     }
 
-    private val mServiceManager: Any
+    private val mWifiManager: WifiManager
 
     init {
-        mServiceManager = context.getSystemService(
-            if (isR())
-                Context.CONNECTIVITY_SERVICE
-            else Context.WIFI_SERVICE
-        )
-
+        // may causes memory leak
+        mWifiManager = context.applicationContext.getSystemService(
+           Context.WIFI_SERVICE
+        ) as WifiManager
     }
 
     fun start() {
 
-        if (isR()) {
-
-
-
-            return
-        }
-
-        val manager = mServiceManager
-            as WifiManager
-
-        val dhcp = manager.dhcpInfo
-
+        val dhcp = mWifiManager.dhcpInfo
         val ipDhcp = dhcp.gateway
 
         if (ipDhcp == 0) {
@@ -61,10 +49,6 @@ class HotspotService(
         Log.d(TAG, "getHotspotIP: $serverIP $ipDhcp")
 
         //onGetIP("$serverIP".substring(1))
-    }
-
-    private fun isR(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
 }
