@@ -42,18 +42,11 @@ class ClientView(
 
     fun createView() {
         val btnConnect = Button(context)
-        val textViewMsg = TextView(context)
 
         mEditTextHost.hint = "Enter host IP"
         mEditTextMsg.hint = "Message"
 
         btnConnect.text = "Connect"
-
-        textViewMsg.text = "----"
-        textViewMsg.textSize = 18f
-        textViewMsg.movementMethod = ScrollingMovementMethod()
-        textViewMsg.isVerticalScrollBarEnabled = true
-        textViewMsg.isHorizontalScrollBarEnabled = false
 
         gravity = Gravity.CENTER
         orientation = VERTICAL
@@ -72,12 +65,6 @@ class ClientView(
 
         addView(
             btnConnect,
-            -1,
-            -2
-        )
-
-        addView(
-            textViewMsg,
             -1,
             -2
         )
