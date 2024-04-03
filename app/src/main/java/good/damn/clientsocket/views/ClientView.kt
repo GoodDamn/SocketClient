@@ -170,9 +170,9 @@ class ClientView(
         addView(btnConnectDns, -1,-2)
         addView(textViewMsg, -1, -2)
 
-        getHotspotIP {
+        /*getHotspotIP {
             mEditTextHost.setText(it)
-        }
+        }*/
     }
 
     @WorkerThread
@@ -218,59 +218,4 @@ class ClientView(
 
     @WorkerThread
     override fun onHttpGet() {}
-
-    private fun getHotspotIP(
-        onGetIP: (String) -> Unit
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val manager = context.getSystemService(CONNECTIVITY_SERVICE)
-                as ConnectivityManager
-
-            val request = NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .build()
-
-            val callback = object : NetworkCallback() {
-                override fun onLinkPropertiesChanged(
-                    network: Network,
-                    link: LinkProperties
-                ) {
-                    val dhcp = link.dhcpServerAddress?.address ?: ByteArray(0)
-                    onGetIP("${dhcp[0]}.${dhcp[1]}.${dhcp[2]}.${dhcp[3]}")
-                    super.onLinkPropertiesChanged(network, link)
-                }
-
-            }
-
-            manager.requestNetwork(request, callback)
-            manager.registerNetworkCallback(request, callback)
-
-            return
-        }
-
-        val manager = context.getSystemService(WIFI_SERVICE)
-                as WifiManager
-
-        val dhcp = manager.dhcpInfo
-
-        val ipDhcp = dhcp.gateway
-
-        if (ipDhcp == 0) {
-            onGetIP("")
-            return
-        }
-
-        val ip = ByteUtils.integer(
-            if (ByteOrder.nativeOrder()
-                    .equals(ByteOrder.LITTLE_ENDIAN)
-            ) Integer.reverseBytes(ipDhcp)
-            else ipDhcp
-        )
-        val gateSt = "${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}"
-        val serverIP = InetAddress.getByName(gateSt)
-
-        Log.d(TAG, "getHotspotIP: $serverIP $ipDhcp")
-
-        onGetIP("$serverIP".substring(1))
-    }
 }

@@ -1,4 +1,4 @@
-package good.damn.clientsocket
+package good.damn.clientsocket.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
