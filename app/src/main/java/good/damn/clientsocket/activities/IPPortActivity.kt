@@ -2,7 +2,6 @@ package good.damn.clientsocket.activities
 
 import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -10,9 +9,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.allViews
 import good.damn.clientsocket.ContentLauncher
-import good.damn.clientsocket.listeners.network.connection.Connectable
+import good.damn.clientsocket.listeners.network.connection.ConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.utils.FileUtils
@@ -23,7 +21,7 @@ class IPPortActivity
     : AppCompatActivity(),
     ClientViewListener,
     ActivityResultCallback<Uri?>,
-    Connectable {
+    ConnectionListener {
 
     private var msgr: Messenger? = null
 
@@ -47,7 +45,6 @@ class IPPortActivity
         btnConnect: Button,
         clientView: ClientView
     ) {
-
         val contentLauncher = ContentLauncher(
             this,
             this
@@ -114,52 +111,26 @@ class IPPortActivity
     }
 
     @WorkerThread
-    override fun onConnected(socket: Socket) {
-        msgr?.addMessage("Connected to ${socket.remoteSocketAddress}")
-    }
-
-    @WorkerThread
-    override fun onSendTextBytes(): ByteArray {
-        return ByteArray(0)
-    }
-
-    @WorkerThread
-    override fun onSendBytes(): ByteArray {
-        return ByteArray(0)
-    }
-
-    @WorkerThread
-    override fun onSendTypeResponse(): Int {
-        return 0 // 1 - file; 2 - text
-    }
-
-    @WorkerThread
-    override fun onGetFile(
-        data: ByteArray,
-        offset: Int,
-        fileName: String
+    override fun onConnected(
+        socket: Socket
     ) {
-        val msg = FileUtils.writeToDoc(fileName, data, offset)
-
-        if (msg != null) {
-            msgr?.addMessage(
-                "Non saved $fileName: $msg"
-            )
-            return
-        }
-
         msgr?.addMessage(
-            "$fileName is saved to Documents"
+            "IPv4 Client: ${socket.remoteSocketAddress}"
         )
     }
 
     @WorkerThread
-    override fun onGetText(msg: String) {
-        msgr?.addMessage(msg)
+    override fun onRequest(): ByteArray {
+        return ByteArray(0)
     }
 
     @WorkerThread
-    override fun onHttpGet() {}
-
+    override fun onResponse(
+        response: ByteArray
+    ) {
+        msgr?.addMessage(
+            "RESPONSE_BYTES: ${response.contentToString()}"
+        )
+    }
 
 }

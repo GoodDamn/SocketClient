@@ -1,23 +1,11 @@
 package good.damn.clientsocket.views
 
-import android.text.Editable
-import android.text.TextWatcher
-import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
-import android.view.View
 import android.widget.*
-import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
-import good.damn.clientsocket.Application
-import good.damn.clientsocket.listeners.network.connection.Connectable
-import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
-import good.damn.clientsocket.utils.FileUtils
-import good.damn.clientsocket.messengers.Messenger
-import good.damn.clientsocket.network.DnsConnection
 import good.damn.clientsocket.services.network.HotspotServiceCompat
-import java.net.Socket
 
 class ClientView(
     activity: AppCompatActivity

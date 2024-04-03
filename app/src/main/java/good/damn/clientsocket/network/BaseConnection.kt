@@ -1,11 +1,26 @@
-package good.damn.clientsocket.listeners.network.connection
+package good.damn.clientsocket.network
 
-import androidx.annotation.WorkerThread
+import android.util.Log
+import good.damn.clientsocket.listeners.network.connection.ConnectionListener
+import good.damn.clientsocket.services.BaseService
+import good.damn.clientsocket.utils.NetworkUtils
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.nio.charset.Charset
 
-interface NetworkInputListener {
+abstract class BaseConnection<DELEGATE>(
+    val hostIp: String,
+    val port: Int
+) {
+    fun start(
+        delegate: DELEGATE
+    ) {
+        onStartConnection(
+            delegate
+        )
+    }
 
-    fun input(
+    /*private fun input(
         data: ByteArray
     ): Boolean {
 
@@ -44,15 +59,9 @@ interface NetworkInputListener {
         }
 
         return true
-    }
+    }*/
 
-    @WorkerThread
-    fun onGetFile(data: ByteArray,offset:Int,fileName: String)
-
-    @WorkerThread
-    fun onGetText(msg: String)
-
-    @WorkerThread
-    fun onHttpGet()
-
+    abstract fun onStartConnection(
+        delegate: DELEGATE
+    )
 }
