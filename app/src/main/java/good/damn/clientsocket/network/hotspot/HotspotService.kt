@@ -32,27 +32,7 @@ class HotspotService(
 
         if (isR()) {
 
-            val manager = mServiceManager
-                as ConnectivityManager
 
-            val request = NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .build()
-
-            val callback = object : ConnectivityManager.NetworkCallback() {
-                override fun onLinkPropertiesChanged(
-                    network: Network,
-                    link: LinkProperties
-                ) {
-                    val dhcp = link.dhcpServerAddress?.address ?: ByteArray(0)
-                    //onGetIP("${dhcp[0]}.${dhcp[1]}.${dhcp[2]}.${dhcp[3]}")
-                    super.onLinkPropertiesChanged(network, link)
-                }
-
-            }
-
-            manager.requestNetwork(request, callback)
-            manager.registerNetworkCallback(request, callback)
 
             return
         }
