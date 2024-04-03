@@ -1,4 +1,4 @@
-package good.damn.clientsocket.network.interfaces
+package good.damn.clientsocket.listeners.network.connection
 
 import android.util.Log
 import androidx.annotation.WorkerThread

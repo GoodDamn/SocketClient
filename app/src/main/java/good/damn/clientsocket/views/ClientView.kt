@@ -8,7 +8,7 @@ import android.widget.*
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.Application
-import good.damn.clientsocket.network.interfaces.Connectable
+import good.damn.clientsocket.listeners.network.connection.Connectable
 import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.utils.FileUtils
