@@ -10,6 +10,7 @@ class Application
 
     companion object {
         val BUFFER_MB = ByteArray(1024*1024)
+        val BUFFER_300 = ByteArray(300)
         val CHARSET = Charset.forName("UTF-8")
         private val HANDLER_MAIN = Handler(
             Looper.getMainLooper()

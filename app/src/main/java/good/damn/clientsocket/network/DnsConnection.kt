@@ -1,12 +1,8 @@
 package good.damn.clientsocket.network
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.connection.DnsConnectionListener
-import good.damn.clientsocket.utils.ByteUtils
-import good.damn.clientsocket.utils.NetworkUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -14,15 +10,11 @@ import java.io.DataOutputStream
 import java.io.EOFException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
-import java.net.Inet4Address
 import java.net.InetAddress
-import java.net.Socket
-import java.nio.charset.Charset
-import java.util.*
-import kotlin.math.log
 
 class DnsConnection(
-    host: String
+    host: String,
+    val mReceiveBuffer: ByteArray
 ): BaseConnection<DnsConnectionListener>(
     host,
     53
@@ -87,11 +79,9 @@ class DnsConnection(
                 packet
             )
 
-            val receiveBuffer = ByteArray(1024)
-
             val receivePacket = DatagramPacket(
-                receiveBuffer,
-                receiveBuffer.size
+                mReceiveBuffer,
+                mReceiveBuffer.size
             )
 
             Log.d(TAG, "connect: UDP-DNS Receive")
@@ -101,12 +91,12 @@ class DnsConnection(
             )
 
             delegate.onRawResponse(
-                receiveBuffer
+                mReceiveBuffer
             )
 
             val inp = DataInputStream(
                 ByteArrayInputStream(
-                    receiveBuffer
+                    mReceiveBuffer
                 )
             )
 

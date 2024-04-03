@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.connection.DnsConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
@@ -19,6 +20,7 @@ class DnsActivity
     DnsConnectionListener {
 
     private val msgr = Messenger()
+    private var mEditTextDomain: EditText? = null
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -46,6 +48,8 @@ class DnsActivity
         btnConnect: Button,
         clientView: ClientView
     ) {
+        mEditTextDomain = editMsg
+
         btnConnect.text = "Connect to DNS"
         editHost.hint = "DNS IP"
         editMsg.hint = "Request domain (google.com, ...)"
@@ -69,7 +73,8 @@ class DnsActivity
 
         btnConnect.setOnClickListener {
             DnsConnection(
-                editHost.text.toString()
+                editHost.text.toString(),
+                Application.BUFFER_300
             ).start(this)
         }
 
@@ -89,7 +94,12 @@ class DnsActivity
     }
 
     override fun onRequestDomain(): String {
-        return "vk.com"
+        if (mEditTextDomain == null) {
+            return "vk.com"
+        }
+
+        return mEditTextDomain!!.text
+            .toString()
     }
 
     override fun onDebugResponse(
