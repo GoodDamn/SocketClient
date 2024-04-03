@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.*
 import android.net.wifi.WifiManager
 import android.util.Log
+import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
 import good.damn.clientsocket.services.BaseService
 import good.damn.clientsocket.utils.ByteUtils
 import java.net.InetAddress
@@ -18,6 +19,8 @@ class HotspotService(
         private const val TAG = "HotspotService"
     }
 
+    var delegate: HotspotServiceListener? = null
+
     private val mWifiManager: WifiManager
 
     init {
@@ -27,13 +30,16 @@ class HotspotService(
         ) as WifiManager
     }
 
+    @OptIn(ExperimentalUnsignedTypes::class)
     override fun start() {
 
         val dhcp = mWifiManager.dhcpInfo
         val ipDhcp = dhcp.gateway
 
         if (ipDhcp == 0) {
-            //onGetIP("")
+            delegate?.onGetHotspotIP(
+                UByteArray(0)
+            )
             return
         }
 
@@ -43,12 +49,10 @@ class HotspotService(
             ) Integer.reverseBytes(ipDhcp)
             else ipDhcp
         )
-        val gateSt = "${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}"
-        val serverIP = InetAddress.getByName(gateSt)
 
-        Log.d(TAG, "getHotspotIP: $serverIP $ipDhcp")
-
-        //onGetIP("$serverIP".substring(1))
+        delegate?.onGetHotspotIP(
+            ip
+        )
     }
 
 }
