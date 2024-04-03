@@ -4,18 +4,12 @@ import androidx.annotation.WorkerThread
 import java.net.Socket
 import java.nio.charset.Charset
 
-interface ConnectionListener {
+interface ConnectionListener
+: BaseConnectionListener {
 
     @WorkerThread
     fun onConnected(
         socket: Socket
     )
 
-    @WorkerThread
-    fun onRequest(): ByteArray
-
-    @WorkerThread
-    fun onResponse(
-        response: ByteArray
-    )
 }

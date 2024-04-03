@@ -13,6 +13,7 @@ import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.network.connection.ConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
+import good.damn.clientsocket.network.OwnConnection
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
 import java.net.Socket
@@ -58,6 +59,12 @@ class IPPortActivity
 
         btnSelectFile.setOnClickListener {
             contentLauncher.launch("*/*")
+        }
+
+        btnConnect.setOnClickListener {
+            OwnConnection(
+                editHost.text.toString()
+            ).start(this)
         }
 
         btnSelectFile.layoutParams = ViewGroup
@@ -121,7 +128,7 @@ class IPPortActivity
 
     @WorkerThread
     override fun onRequest(): ByteArray {
-        return ByteArray(0)
+        return byteArrayOf(0,15,15)
     }
 
     @WorkerThread

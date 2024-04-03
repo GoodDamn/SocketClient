@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import good.damn.clientsocket.listeners.network.connection.DnsConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.DnsConnection
@@ -14,7 +15,8 @@ import good.damn.clientsocket.views.ClientView
 
 class DnsActivity
     : AppCompatActivity(),
-    ClientViewListener {
+    ClientViewListener,
+    DnsConnectionListener {
 
     private val msgr = Messenger()
 
@@ -68,15 +70,34 @@ class DnsActivity
         btnConnect.setOnClickListener {
             DnsConnection(
                 editHost.text.toString()
-            ).connect(
-                editMsg.text.toString()
-            ) { response, ip ->
-                msgr.addMessage(
-                    response
-                )
-            }
+            ).start(this)
         }
 
+    }
+
+    override fun onGetIP(
+        domain: String,
+        ip: String
+    ) {}
+
+    override fun onRawResponse(
+        response: ByteArray
+    ) {
+        msgr.addMessage(
+            "RAW_RESPONSE: ${response.contentToString()}"
+        )
+    }
+
+    override fun onRequestDomain(): String {
+        return "vk.com"
+    }
+
+    override fun onDebugResponse(
+        response: String
+    ) {
+        msgr.addMessage(
+            "DEBUG_RESPONSE: $response"
+        )
     }
 
 }

@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import good.damn.clientsocket.Application
+import good.damn.clientsocket.listeners.network.connection.DnsConnectionListener
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.NetworkUtils
 import java.io.ByteArrayInputStream
@@ -22,19 +23,17 @@ import kotlin.math.log
 
 class DnsConnection(
     host: String
+): BaseConnection<DnsConnectionListener>(
+    host,
+    53
 ) {
-    private val mHost = host
-
     companion object {
         private const val TAG = "DnsConnection"
-        private const val DNS_PORT = 53
     }
 
-    fun connect(
-        domain: String,
-        onGetDomainIPPort: (String, Int) -> Unit
+    override fun onStartConnection(
+        delegate: DnsConnectionListener
     ) {
-
         Thread {
             val socket = DatagramSocket()
 
@@ -42,7 +41,7 @@ class DnsConnection(
             val dos = DataOutputStream(baos)
 
             val toAddress = InetAddress
-                .getByName(mHost)
+                .getByName(hostIp)
 
             dos.writeShort(0x0015) // ID
             dos.writeShort(0x0100) // Flags
@@ -51,6 +50,7 @@ class DnsConnection(
             dos.writeShort(0x0000) // number of authority RRs
             dos.writeShort(0x0000) // number of additional RRs
 
+            val domain = delegate.onRequestDomain()
             val domainParts = domain.split("\\.".toRegex())
             Log.d(TAG, "connect: DOMAIN $domain WITH ${domainParts.size} portions")
             for (part in domainParts) {
@@ -78,10 +78,10 @@ class DnsConnection(
                 0,
                 requestBytes.size,
                 toAddress,
-                DNS_PORT
+                port
             )
 
-            Log.d(TAG, "connect: UDP send ${toAddress.hostName} $mHost")
+            Log.d(TAG, "connect: UDP send ${toAddress.hostName} $hostIp")
 
             socket.send(
                 packet
@@ -100,7 +100,9 @@ class DnsConnection(
                 receivePacket
             )
 
-            Log.d(TAG, "connect: UDP-DNS RECEIVED: PROCESSING ${receiveBuffer.contentToString()}")
+            delegate.onRawResponse(
+                receiveBuffer
+            )
 
             val inp = DataInputStream(
                 ByteArrayInputStream(
@@ -120,7 +122,7 @@ class DnsConnection(
             var records = ""
 
             var recordLen: Byte
-            while(true) {
+            while (true) {
                 recordLen = inp.readByte()
 
                 if (recordLen <= 0) {
@@ -149,7 +151,7 @@ class DnsConnection(
             var addressString = ""
 
             Log.d(TAG, "connect: ADDRESS_LEN: $addressLen")
-            
+
             for (i in 0 until addressLen) {
                 try {
                     addressString += "${inp.readByte().toInt() and 0xff}."
@@ -160,7 +162,7 @@ class DnsConnection(
             }
 
             inp.close()
-            
+
             val responseDNS = """
                 REQUEST_ID: $requestID
                 FLAGS: ${Integer.toBinaryString(flags).substring(16)}
@@ -177,11 +179,15 @@ class DnsConnection(
                 TIME TO LIVE: $ttl
                 IPv4: $addressString
             """.trimIndent()
-            
+
+            delegate.onDebugResponse(
+                responseDNS
+            )
+
             Application.ui {
-                onGetDomainIPPort(
-                    responseDNS,
-                    0
+                delegate.onGetIP(
+                    domain,
+                    addressString
                 )
             }
 
