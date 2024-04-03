@@ -9,10 +9,7 @@ import good.damn.clientsocket.services.BaseService
 @RequiresApi(30)
 class HotspotServiceApi30(
     context: Context
-): BaseService(context) {
-
-
-    var delegate: HotspotServiceListener? = null
+): BaseService<HotspotServiceListener>(context) {
 
     private val mConnectivityManager: ConnectivityManager
     private val mNetworkRequest: NetworkRequest

@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.network.interfaces.Connectable
 import good.damn.clientsocket.ContentLauncher
+import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.DnsConnection
@@ -27,12 +28,10 @@ import java.net.InetAddress
 import java.net.Socket
 import java.nio.ByteOrder
 
-@ExperimentalUnsignedTypes
 class ClientView(
-    context: Context,
     activity: AppCompatActivity
-) : LinearLayout(context),
-    Connectable {
+) : LinearLayout(activity),
+    Connectable, HotspotServiceListener {
 
     private val TAG = "ClientView"
 
@@ -175,6 +174,7 @@ class ClientView(
         mHotspotService = HotspotServiceCompat(
             context
         )
+        mHotspotService.delegate = this
         mHotspotService.start()
     }
 
@@ -221,4 +221,16 @@ class ClientView(
 
     @WorkerThread
     override fun onHttpGet() {}
+
+    override fun onGetHotspotIP(
+        ip: ByteArray
+    ) {
+        if (ip.size == 0) {
+            return
+        }
+
+        mEditTextHost.setText(
+            "${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}"
+        )
+    }
 }

@@ -13,13 +13,11 @@ import java.nio.ByteOrder
 @Deprecated("dhcpInfo of WifiManager class is deprecated")
 class HotspotService(
     context: Context
-): BaseService(context) {
+): BaseService<HotspotServiceListener>(context) {
 
     companion object {
         private const val TAG = "HotspotService"
     }
-
-    var delegate: HotspotServiceListener? = null
 
     private val mWifiManager: WifiManager
 
