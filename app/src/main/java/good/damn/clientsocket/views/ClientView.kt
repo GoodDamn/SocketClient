@@ -153,12 +153,4 @@ class ClientView(
             "${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}"
         )
     }
-
-    final override fun addView(
-        child: View?,
-        width: Int,
-        height: Int
-    ) {
-        super.addView(child, width, height)
-    }
 }
