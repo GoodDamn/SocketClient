@@ -113,8 +113,8 @@ class ClientView(
 
         btnConnectDns.setOnClickListener {
             val dns = DnsConnection(
-                mEditTextHost.text.toString(),
-                53)
+                mEditTextHost.text.toString()
+            )
             dns.connect(
                 mEditTextMsg.text.toString()
             ) { msg, _ ->

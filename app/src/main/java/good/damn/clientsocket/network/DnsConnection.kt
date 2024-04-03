@@ -3,6 +3,7 @@ package good.damn.clientsocket.network
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import good.damn.clientsocket.Application
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.NetworkUtils
 import java.io.ByteArrayInputStream
@@ -20,17 +21,13 @@ import java.util.*
 import kotlin.math.log
 
 class DnsConnection(
-    host: String,
-    port: Int
+    host: String
 ) {
     private val mHost = host
-    private val mPort = port
-    private val mCharset = Charset.forName("UTF-8")
-    private val mIPBuffer = ByteArray(8)
-    private val mainThread = Handler(Looper.getMainLooper())
 
     companion object {
         private const val TAG = "DnsConnection"
+        private const val DNS_PORT = 53
     }
 
     fun connect(
@@ -58,7 +55,9 @@ class DnsConnection(
             Log.d(TAG, "connect: DOMAIN $domain WITH ${domainParts.size} portions")
             for (part in domainParts) {
                 dos.write(part.length)
-                dos.write(part.toByteArray(mCharset)) // UTF-8
+                dos.write(part.toByteArray(
+                    Application.CHARSET
+                )) // UTF-8
             }
 
             dos.writeByte(
@@ -79,7 +78,7 @@ class DnsConnection(
                 0,
                 requestBytes.size,
                 toAddress,
-                53 // DNS-port
+                DNS_PORT
             )
 
             Log.d(TAG, "connect: UDP send ${toAddress.hostName} $mHost")
@@ -131,7 +130,10 @@ class DnsConnection(
                 val recBytes = ByteArray(recordLen.toInt())
                 inp.read(recBytes)
 
-                records += "\nRECORD: ${String(recBytes,mCharset)}"
+                records += "\nRECORD: ${String(
+                    recBytes,
+                    Application.CHARSET
+                )}"
             }
 
             val recordType = inp.readShort()
@@ -176,7 +178,7 @@ class DnsConnection(
                 IPv4: $addressString
             """.trimIndent()
             
-            mainThread.run {
+            Application.ui {
                 onGetDomainIPPort(
                     responseDNS,
                     0
