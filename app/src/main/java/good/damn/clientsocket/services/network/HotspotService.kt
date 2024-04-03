@@ -1,18 +1,18 @@
-package good.damn.clientsocket.network.hotspot
+package good.damn.clientsocket.services.network
 
 import android.content.Context
 import android.net.*
 import android.net.wifi.WifiManager
-import android.os.Build
 import android.util.Log
+import good.damn.clientsocket.services.BaseService
 import good.damn.clientsocket.utils.ByteUtils
 import java.net.InetAddress
 import java.nio.ByteOrder
 
 @Deprecated("dhcpInfo of WifiManager class is deprecated")
 class HotspotService(
-    val context: Context
-) {
+    context: Context
+): BaseService(context) {
 
     companion object {
         private const val TAG = "HotspotService"
@@ -27,7 +27,7 @@ class HotspotService(
         ) as WifiManager
     }
 
-    fun start() {
+    override fun start() {
 
         val dhcp = mWifiManager.dhcpInfo
         val ipDhcp = dhcp.gateway
