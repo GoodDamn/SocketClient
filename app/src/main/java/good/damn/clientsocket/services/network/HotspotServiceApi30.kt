@@ -3,12 +3,16 @@ package good.damn.clientsocket.services.network
 import android.content.Context
 import android.net.*
 import androidx.annotation.RequiresApi
+import good.damn.clientsocket.listeners.service.network.HotspotServiceListener
 import good.damn.clientsocket.services.BaseService
 
 @RequiresApi(30)
 class HotspotServiceApi30(
     context: Context
 ): BaseService(context) {
+
+
+    var delegate: HotspotServiceListener? = null
 
     private val mConnectivityManager: ConnectivityManager
     private val mNetworkRequest: NetworkRequest
@@ -29,7 +33,9 @@ class HotspotServiceApi30(
                 link: LinkProperties
             ) {
                 val dhcp = link.dhcpServerAddress?.address ?: ByteArray(0)
-                //onGetIP("${dhcp[0]}.${dhcp[1]}.${dhcp[2]}.${dhcp[3]}")
+                delegate?.onGetHotspotIP(
+                    dhcp
+                )
                 super.onLinkPropertiesChanged(network, link)
             }
         }

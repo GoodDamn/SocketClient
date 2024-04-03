@@ -30,7 +30,6 @@ class HotspotService(
         ) as WifiManager
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     override fun start() {
 
         val dhcp = mWifiManager.dhcpInfo
@@ -38,7 +37,7 @@ class HotspotService(
 
         if (ipDhcp == 0) {
             delegate?.onGetHotspotIP(
-                UByteArray(0)
+                ByteArray(0)
             )
             return
         }
