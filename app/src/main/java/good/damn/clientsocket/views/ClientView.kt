@@ -15,11 +15,13 @@ import android.view.Gravity
 import android.widget.*
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
+import good.damn.clientsocket.Application
 import good.damn.clientsocket.network.interfaces.Connectable
 import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.DnsConnection
+import good.damn.clientsocket.services.network.HotspotServiceCompat
 import good.damn.clientsocket.utils.ByteUtils
 import java.net.InetAddress
 import java.net.Socket
@@ -42,7 +44,7 @@ class ClientView(
     private var mResponse = byteArrayOf(48)
     private var mResponseText = byteArrayOf(48)
 
-    private val mBuffer = ByteArray(1024*1024)
+    private val mHotspotService: HotspotServiceCompat
 
     init {
         val contentLauncher = ContentLauncher(activity) {
@@ -125,7 +127,7 @@ class ClientView(
             connectToHost(
                 mEditTextHost.text.toString(),
                 8080,
-                mBuffer
+                Application.BUFFER_MB
             )
         }
 
@@ -170,9 +172,10 @@ class ClientView(
         addView(btnConnectDns, -1,-2)
         addView(textViewMsg, -1, -2)
 
-        /*getHotspotIP {
-            mEditTextHost.setText(it)
-        }*/
+        mHotspotService = HotspotServiceCompat(
+            context
+        )
+        mHotspotService.start()
     }
 
     @WorkerThread
