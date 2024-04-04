@@ -10,10 +10,13 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.ContentLauncher
+import good.damn.clientsocket.builder.shareProtocol.ShareRequestBuilder
 import good.damn.clientsocket.listeners.network.connection.ConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.OwnConnection
+import good.damn.clientsocket.shareProtocol.ShareRequestBodyList
+import good.damn.clientsocket.shareProtocol.ShareRequestMethod
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
 import java.net.Socket
@@ -128,7 +131,12 @@ class IPPortActivity
 
     @WorkerThread
     override fun onRequest(): ByteArray {
-        return byteArrayOf(0,15,15)
+        val shareRequest = ShareRequestBuilder()
+            .setMethod(ShareRequestMethod("li"))
+            .setBody(ShareRequestBodyList())
+            .build() ?: return ByteArray(0)
+
+        return shareRequest.toByteArray()
     }
 
     @WorkerThread

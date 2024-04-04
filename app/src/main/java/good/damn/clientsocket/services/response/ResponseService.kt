@@ -1,15 +1,13 @@
-package good.damn.clientsocket.services
+package good.damn.clientsocket.services.response
 
 import android.util.Log
 import good.damn.clientsocket.utils.ByteUtils
-import kotlin.math.log
 
 class ResponseService {
 
     companion object {
         private const val TAG = "ResponseService"
-
-        private const val RESPONSE_ID_LIST = 280
+        private const val RESPONSE_ID_LIST = 426
     }
 
     private val mResponses: HashMap<

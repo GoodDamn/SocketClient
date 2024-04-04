@@ -1,6 +1,7 @@
 package good.damn.clientsocket.utils
 
 import android.util.Log
+import good.damn.clientsocket.Application
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -11,7 +12,7 @@ class NetworkUtils {
         fun readBytes(
             inp: InputStream
         ): ByteArray {
-            return readBytes(inp, ByteArray(1024*1024))
+            return readBytes(inp, Application.BUFFER_MB)
         }
 
         fun readBytes(
