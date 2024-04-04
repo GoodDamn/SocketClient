@@ -16,10 +16,10 @@ class ByteUtils {
             buf: ByteArray,
             off: Int
         ): Int {
-            return (buf[off].toInt() and 0xff) or
-                    ((buf[off+1].toInt() shr 8)) or
-                    ((buf[off+2].toInt() shr 16)) or
-                    ((buf[off+3].toInt() shr 24))
+            return (buf[off].toInt() and 0xff shl 24) or
+                    (buf[off+1].toInt() and 0xff shl 16) or
+                    (buf[off+2].toInt() and 0xff shl 8) or
+                    (buf[off+3].toInt() and 0xff)
         }
 
     }

@@ -17,6 +17,7 @@ import good.damn.clientsocket.listeners.network.connection.ConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.OwnConnection
+import good.damn.clientsocket.services.response.ResponseService
 import good.damn.clientsocket.shareProtocol.ShareRequestBodyList
 import good.damn.clientsocket.shareProtocol.ShareRequestMethod
 import good.damn.clientsocket.utils.FileUtils
@@ -30,6 +31,8 @@ class IPPortActivity
     ConnectionListener {
 
     private var msgr = Messenger()
+
+    private val mResponseService = ResponseService()
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -161,6 +164,10 @@ class IPPortActivity
     ) {
         msgr.addMessage(
             "RESPONSE_BYTES: ${response.contentToString()}"
+        )
+
+        mResponseService.decodeResponse(
+            response
         )
     }
 
