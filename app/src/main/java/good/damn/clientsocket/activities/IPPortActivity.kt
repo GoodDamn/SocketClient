@@ -2,9 +2,11 @@ package good.damn.clientsocket.activities
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.annotation.WorkerThread
@@ -27,7 +29,7 @@ class IPPortActivity
     ActivityResultCallback<Uri?>,
     ConnectionListener {
 
-    private var msgr: Messenger? = null
+    private var msgr = Messenger()
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -58,6 +60,14 @@ class IPPortActivity
             this
         )
 
+        val textViewMsg = TextView(this)
+        textViewMsg.text = "----"
+        textViewMsg.textSize = 18f
+        textViewMsg.movementMethod = ScrollingMovementMethod()
+        textViewMsg.isVerticalScrollBarEnabled = true
+        textViewMsg.isHorizontalScrollBarEnabled = false
+        msgr.setTextView(textViewMsg)
+
         btnSelectFile.text = "Select file for response"
 
         btnSelectFile.setOnClickListener {
@@ -76,6 +86,12 @@ class IPPortActivity
         clientView.addView(
             btnSelectFile,
             clientView.childCount - 2 // before messenger
+        )
+
+        clientView.addView(
+            textViewMsg,
+            -1,
+            500
         )
     }
 
@@ -124,7 +140,7 @@ class IPPortActivity
     override fun onConnected(
         socket: Socket
     ) {
-        msgr?.addMessage(
+        msgr.addMessage(
             "IPv4 Client: ${socket.remoteSocketAddress}"
         )
     }
@@ -143,7 +159,7 @@ class IPPortActivity
     override fun onResponse(
         response: ByteArray
     ) {
-        msgr?.addMessage(
+        msgr.addMessage(
             "RESPONSE_BYTES: ${response.contentToString()}"
         )
     }
