@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.builder.shareProtocol.ShareRequestBuilder
 import good.damn.clientsocket.listeners.network.connection.ConnectionListener
+import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.OwnConnection
@@ -28,7 +29,8 @@ class IPPortActivity
     : AppCompatActivity(),
     ClientViewListener,
     ActivityResultCallback<Uri?>,
-    ConnectionListener {
+    ConnectionListener,
+    ResponseServiceListener {
 
     private var msgr = Messenger()
 
@@ -38,6 +40,8 @@ class IPPortActivity
         savedInstanceState: Bundle?
     ) {
         super.onCreate(savedInstanceState)
+
+        mResponseService.delegate = this
 
         val clientView = ClientView(this)
         clientView.delegate = this
@@ -169,6 +173,20 @@ class IPPortActivity
         mResponseService.decodeResponse(
             response
         )
+    }
+
+    override fun onModelResponse(
+        model: Any
+    ) {
+        if (model is List<*>) { // ShareMethodList -> List
+            msgr.addMessage(
+                "RESPONSE_FILES_LIST:"
+            )
+
+            for (fileName in (model as List<String>)) {
+                msgr.addMessage(fileName)
+            }
+        }
     }
 
 }
