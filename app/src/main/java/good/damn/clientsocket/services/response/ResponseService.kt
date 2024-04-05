@@ -15,7 +15,7 @@ class ResponseService {
     companion object {
         private const val TAG = "ResponseService"
         private const val RESPONSE_ID_LIST = 426
-        private const val RESPONSE_ID_GET_FILE = 405
+        private const val RESPONSE_ID_GET_FILE = 410
     }
 
     var delegate: ResponseServiceListener? = null

@@ -167,10 +167,6 @@ class IPPortActivity
             "\\s+".toRegex()
         )
 
-        if (params.size == 1) {
-            return ByteArray(0)
-        }
-
         val shareRequest = ShareRequestBuilder()
             .setMethod(ShareRequestMethod(
                 params[0]
@@ -189,7 +185,7 @@ class IPPortActivity
         response: ByteArray
     ) {
         msgr.addMessage(
-            "RESPONSE_BYTES: ${response.contentToString()}"
+            "RESPONSE_BYTES: ${response[0]}"
         )
 
         if (response.isEmpty()) {
