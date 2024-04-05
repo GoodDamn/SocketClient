@@ -19,6 +19,7 @@ import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.OwnConnection
 import good.damn.clientsocket.services.response.ResponseService
+import good.damn.clientsocket.shareProtocol.ShareModelFile
 import good.damn.clientsocket.shareProtocol.ShareRequestBodyArgs
 import good.damn.clientsocket.shareProtocol.ShareRequestMethod
 import good.damn.clientsocket.utils.FileUtils
@@ -199,6 +200,7 @@ class IPPortActivity
         )
     }
 
+    @WorkerThread
     override fun onModelResponse(
         model: Any
     ) {
@@ -210,6 +212,21 @@ class IPPortActivity
             for (fileName in (model as List<String>)) {
                 msgr.addMessage(fileName)
             }
+            return
+        }
+
+
+        if (model is ShareModelFile) {
+            msgr.addMessage(
+                "RESPONSE_FILE: ${model.fileSize} bytes"
+            )
+
+            FileUtils.writeToDoc(
+                "some_file_name",
+                model.file,
+                model.filePosition
+            )
+            return
         }
     }
 
