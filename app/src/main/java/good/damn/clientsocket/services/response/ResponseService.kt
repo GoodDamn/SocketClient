@@ -1,6 +1,7 @@
 package good.damn.clientsocket.services.response
 
 import android.util.Log
+import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.FileUtils
@@ -13,9 +14,6 @@ class ResponseService {
         private const val TAG = "ResponseService"
         private const val RESPONSE_ID_LIST = 426
         private const val RESPONSE_ID_GET_FILE = 405
-        private val CHARSET_ASCII = Charset.forName(
-            "US-ASCII"
-        )
     }
 
     var delegate: ResponseServiceListener? = null
@@ -27,7 +25,7 @@ class ResponseService {
 
     init {
 
-        mResponses[RESPONSE_ID_LIST] = {
+        mResponses[RESPONSE_ID_GET_FILE] = {
             val fileSize = ByteUtils
                 .integer(it,4)
 
@@ -54,7 +52,7 @@ class ResponseService {
                     it,
                     position,
                     fileNameLength,
-                    CHARSET_ASCII
+                    Application.CHARSET_ASCII
                 )
                 position += fileNameLength
 
