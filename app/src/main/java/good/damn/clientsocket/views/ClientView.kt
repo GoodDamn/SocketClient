@@ -75,8 +75,13 @@ class ClientView(
             return
         }
 
+        val ip1 = ip[0].toInt() and 0xff
+        val ip2 = ip[1].toInt() and 0xff
+        val ip3 = ip[2].toInt() and 0xff
+        val ip4 = ip[3].toInt() and 0xff
+
         mEditTextHost.setText(
-            "${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}"
+            "$ip1.$ip2.$ip3.$ip4"
         )
     }
 }
