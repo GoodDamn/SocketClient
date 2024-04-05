@@ -36,6 +36,8 @@ class IPPortActivity
 
     private var mEditTextRequest: EditText? = null
 
+    private var mTextQuery = "temp"
+
     private var msgr = Messenger()
     private val mResponseService = ResponseService()
 
@@ -167,6 +169,8 @@ class IPPortActivity
             "\\s+".toRegex()
         )
 
+        mTextQuery = mEditTextRequest!!.text.toString()
+
         val shareRequest = ShareRequestBuilder()
             .setMethod(ShareRequestMethod(
                 params[0]
@@ -219,7 +223,7 @@ class IPPortActivity
             )
 
             FileUtils.writeToDoc(
-                "some_file_name",
+                mTextQuery,
                 model.file,
                 model.filePosition
             )
