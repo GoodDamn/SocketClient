@@ -3,6 +3,7 @@ package good.damn.clientsocket.services.response
 import android.util.Log
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
+import good.damn.clientsocket.shareProtocol.ShareModelFile
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.FileUtils
 import java.nio.charset.Charset
@@ -29,10 +30,12 @@ class ResponseService {
             val fileSize = ByteUtils
                 .integer(it,4)
 
-            FileUtils.writeToDoc(
-                "some_name",
-                it,
-                8
+            delegate?.onModelResponse(
+                ShareModelFile(
+                    fileSize,
+                    it,
+                    8
+                )
             )
         }
 
