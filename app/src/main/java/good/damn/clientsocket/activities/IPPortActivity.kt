@@ -104,7 +104,7 @@ class IPPortActivity
         clientView.addView(
             textViewMsg,
             -1,
-            500
+            -1
         )
     }
 

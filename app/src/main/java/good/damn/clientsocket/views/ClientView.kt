@@ -36,7 +36,6 @@ class ClientView(
 
         btnConnect.text = "Connect"
 
-        gravity = Gravity.CENTER
         orientation = VERTICAL
 
         addView(

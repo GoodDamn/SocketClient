@@ -42,7 +42,7 @@ class FileUtils {
                 Environment.DIRECTORY_DOCUMENTS
             )
 
-            val subDir = File(dir, "SharedClient")
+            val subDir = File(dir, "ClientDir")
 
             if (!subDir.exists() && subDir.mkdir()) {
                 Log.d(TAG, "writeToDoc: dir $subDir is created")

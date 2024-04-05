@@ -64,7 +64,7 @@ class DnsActivity
         clientView.addView(
             textViewMsg,
             -1,
-            500
+            -2
         )
 
         msgr.setTextView(
