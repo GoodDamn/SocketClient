@@ -1,8 +1,44 @@
 package good.damn.clientsocket.utils
 
+import java.io.ByteArrayOutputStream
+import java.nio.charset.Charset
+
 class ByteUtils {
 
     companion object {
+
+        fun stringList(
+            list: List<String>,
+            charset: Charset,
+            offset: Int = 0
+        ): ByteArray {
+
+            val baos = ByteArrayOutputStream()
+
+            baos.write( // List count (0-255)
+                list.size - offset
+            )
+
+            for (i in offset until list.size) {
+                val bytes = list[i].toByteArray(
+                    charset
+                )
+
+                baos.write( // Length (0-255)
+                    bytes.size
+                )
+
+                baos.write( // Content
+                    bytes
+                )
+            }
+
+            val result = baos.toByteArray()
+            baos.close()
+
+            return result
+        }
+
         fun integer(i: Int): ByteArray {
             return byteArrayOf(
                 ((i shr 24) and 0xff).toByte(),
