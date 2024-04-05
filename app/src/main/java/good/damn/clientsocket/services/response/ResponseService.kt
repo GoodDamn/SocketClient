@@ -4,6 +4,7 @@ import android.util.Log
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
 import good.damn.clientsocket.shareProtocol.ShareModelFile
+import good.damn.clientsocket.shareProtocol.ShareModelListString
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.FileUtils
 import java.nio.charset.Charset
@@ -67,7 +68,9 @@ class ResponseService {
             }
 
             delegate?.onModelResponse(
-                fileNames
+                ShareModelListString(
+                    fileNames
+                )
             )
         }
     }

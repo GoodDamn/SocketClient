@@ -20,6 +20,7 @@ import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.OwnConnection
 import good.damn.clientsocket.services.response.ResponseService
 import good.damn.clientsocket.shareProtocol.ShareModelFile
+import good.damn.clientsocket.shareProtocol.ShareModelListString
 import good.damn.clientsocket.shareProtocol.ShareRequestBodyArgs
 import good.damn.clientsocket.shareProtocol.ShareRequestMethod
 import good.damn.clientsocket.utils.FileUtils
@@ -204,12 +205,12 @@ class IPPortActivity
     override fun onModelResponse(
         model: Any
     ) {
-        if (model is List<*>) { // ShareMethodList -> List
+        if (model is ShareModelListString) {
             msgr.addMessage(
                 "RESPONSE_FILES_LIST:"
             )
 
-            for (fileName in (model as List<String>)) {
+            for (fileName in model.list) {
                 msgr.addMessage(fileName)
             }
             return
