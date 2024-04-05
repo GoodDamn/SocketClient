@@ -19,7 +19,7 @@ import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.network.OwnConnection
 import good.damn.clientsocket.services.response.ResponseService
-import good.damn.clientsocket.shareProtocol.ShareRequestBodyList
+import good.damn.clientsocket.shareProtocol.ShareRequestBodyArgs
 import good.damn.clientsocket.shareProtocol.ShareRequestMethod
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
@@ -173,7 +173,10 @@ class IPPortActivity
             .setMethod(ShareRequestMethod(
                 params[0]
             ))
-            .setBody(ShareRequestBodyList())
+            .setBody(ShareRequestBodyArgs(
+                params,
+                1
+            ))
             .build() ?: return ByteArray(0)
 
         return shareRequest.toByteArray()

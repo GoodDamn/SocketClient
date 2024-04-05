@@ -1,3 +1,11 @@
 package good.damn.clientsocket.shareProtocol
 
-abstract class ShareRequestBody: ShareByteArray()
+open class ShareRequestBody(
+    private val content: ByteArray
+): ShareByteArray() {
+
+    override fun toByteArray(): ByteArray {
+        return content
+    }
+
+}

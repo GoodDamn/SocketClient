@@ -2,11 +2,7 @@ package good.damn.clientsocket.network
 
 import android.util.Log
 import good.damn.clientsocket.Application
-import good.damn.clientsocket.builder.shareProtocol.ShareRequestBuilder
 import good.damn.clientsocket.listeners.network.connection.ConnectionListener
-import good.damn.clientsocket.shareProtocol.ShareRequestBody
-import good.damn.clientsocket.shareProtocol.ShareRequestBodyList
-import good.damn.clientsocket.shareProtocol.ShareRequestMethod
 import good.damn.clientsocket.utils.NetworkUtils
 import java.net.InetSocketAddress
 import java.net.Socket
