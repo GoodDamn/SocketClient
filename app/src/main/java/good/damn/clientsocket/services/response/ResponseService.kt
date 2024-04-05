@@ -3,6 +3,7 @@ package good.damn.clientsocket.services.response
 import android.util.Log
 import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
 import good.damn.clientsocket.utils.ByteUtils
+import good.damn.clientsocket.utils.FileUtils
 import java.nio.charset.Charset
 import java.util.LinkedList
 
@@ -11,6 +12,7 @@ class ResponseService {
     companion object {
         private const val TAG = "ResponseService"
         private const val RESPONSE_ID_LIST = 426
+        private const val RESPONSE_ID_GET_FILE = 405
         private val CHARSET_ASCII = Charset.forName(
             "US-ASCII"
         )
@@ -24,6 +26,18 @@ class ResponseService {
     > = HashMap()
 
     init {
+
+        mResponses[RESPONSE_ID_LIST] = {
+            val fileSize = ByteUtils
+                .integer(it,4)
+
+            FileUtils.writeToDoc(
+                "some_name",
+                it,
+                8
+            )
+        }
+
         mResponses[RESPONSE_ID_LIST] = {
             val count = it[4].toInt()
             var position = 5

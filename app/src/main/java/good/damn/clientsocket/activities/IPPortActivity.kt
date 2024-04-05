@@ -32,8 +32,9 @@ class IPPortActivity
     ConnectionListener,
     ResponseServiceListener {
 
-    private var msgr = Messenger()
+    private var mEditTextRequest: EditText? = null
 
+    private var msgr = Messenger()
     private val mResponseService = ResponseService()
 
     override fun onCreate(
@@ -58,6 +59,7 @@ class IPPortActivity
         btnConnect: Button,
         clientView: ClientView
     ) {
+        mEditTextRequest = editMsg
         val contentLauncher = ContentLauncher(
             this,
             this
@@ -154,8 +156,23 @@ class IPPortActivity
 
     @WorkerThread
     override fun onRequest(): ByteArray {
+
+        if (mEditTextRequest == null) {
+            return ByteArray(0)
+        }
+
+        val params = mEditTextRequest!!.text.split(
+            "\\s+".toRegex()
+        )
+
+        if (params.size == 1) {
+            return ByteArray(0)
+        }
+
         val shareRequest = ShareRequestBuilder()
-            .setMethod(ShareRequestMethod("li"))
+            .setMethod(ShareRequestMethod(
+                params[0]
+            ))
             .setBody(ShareRequestBodyList())
             .build() ?: return ByteArray(0)
 
@@ -169,6 +186,10 @@ class IPPortActivity
         msgr.addMessage(
             "RESPONSE_BYTES: ${response.contentToString()}"
         )
+
+        if (response.isEmpty()) {
+            return
+        }
 
         mResponseService.decodeResponse(
             response
