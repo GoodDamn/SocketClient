@@ -7,7 +7,7 @@ import good.damn.clientsocket.utils.NetworkUtils
 import java.net.InetSocketAddress
 import java.net.Socket
 
-class OwnConnection(
+class ShareProtocolConnection(
     hostIp: String
 ): BaseConnection<ConnectionListener>(
     hostIp,

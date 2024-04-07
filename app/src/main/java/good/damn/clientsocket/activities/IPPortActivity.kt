@@ -17,7 +17,7 @@ import good.damn.clientsocket.listeners.network.connection.ConnectionListener
 import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.messengers.Messenger
-import good.damn.clientsocket.network.OwnConnection
+import good.damn.clientsocket.network.ShareProtocolConnection
 import good.damn.clientsocket.services.response.ResponseService
 import good.damn.clientsocket.shareProtocol.ShareModelFile
 import good.damn.clientsocket.shareProtocol.ShareModelListString
@@ -88,7 +88,7 @@ class IPPortActivity
         }
 
         btnConnect.setOnClickListener {
-            OwnConnection(
+            ShareProtocolConnection(
                 editHost.text.toString()
             ).start(this)
         }
