@@ -23,6 +23,10 @@ class MainActivity
             context
         )
 
+        val btnDhcp = Button(
+            context
+        )
+
         val layout = LinearLayout(
             context
         )
@@ -32,6 +36,7 @@ class MainActivity
 
         btnDns.text = "DNS"
         btnIPPort.text = "IP:Port"
+        btnDhcp.text = "DHCP"
 
         btnDns.setOnClickListener(
             this::onClickBtnDns
@@ -39,6 +44,10 @@ class MainActivity
 
         btnIPPort.setOnClickListener(
             this::onClickBtnIPPort
+        )
+
+        btnDhcp.setOnClickListener(
+            this::onClickBtnDhcp
         )
 
         layout.addView(
@@ -49,6 +58,12 @@ class MainActivity
 
         layout.addView(
             btnIPPort,
+            -1,
+            -2
+        )
+
+        layout.addView(
+            btnDhcp,
             -1,
             -2
         )
@@ -75,6 +90,17 @@ class MainActivity
         val intent = Intent(
             this,
             IPPortActivity::class.java
+        )
+
+        startActivity(intent)
+    }
+
+    private fun onClickBtnDhcp(
+        view: View
+    ) {
+        val intent = Intent(
+            this,
+            DhcpActivity::class.java
         )
 
         startActivity(intent)

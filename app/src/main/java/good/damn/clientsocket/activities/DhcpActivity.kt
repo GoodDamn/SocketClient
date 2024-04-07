@@ -6,7 +6,9 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.listeners.view.ClientViewListener
+import good.damn.clientsocket.network.DhcpConnection
 import good.damn.clientsocket.views.ClientView
+import java.util.Objects
 
 class DhcpActivity
     : AppCompatActivity() {
@@ -18,6 +20,12 @@ class DhcpActivity
             savedInstanceState
         )
 
+        val connection = DhcpConnection()
+        val a = Any()
+
+        connection.start(
+            a
+        )
 
     }
 

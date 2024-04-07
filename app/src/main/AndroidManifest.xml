@@ -28,6 +28,7 @@
 
         <activity android:name=".activities.DnsActivity"/>
         <activity android:name=".activities.IPPortActivity"/>
+        <activity android:name=".activities.DhcpActivity"/>
 
     </application>
 
