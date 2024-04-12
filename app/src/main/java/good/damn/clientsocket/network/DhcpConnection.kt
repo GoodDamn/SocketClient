@@ -2,12 +2,13 @@ package good.damn.clientsocket.network
 
 import android.util.Log
 import good.damn.clientsocket.Application
+import good.damn.clientsocket.listeners.network.connection.DhcpConnectionListener
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 
 class DhcpConnection
-: BaseConnection<Any>(
+: BaseConnection<DhcpConnectionListener>(
     "255.255.255.255",
     8080
 ) {
@@ -17,18 +18,15 @@ class DhcpConnection
     }
 
     override fun onStartConnection(
-        delegate: Any
+        delegate: DhcpConnectionListener
     ) {
 
         Thread {
-            val buf = Application.BUFFER_300
             val addr = InetAddress.getByName(
                 hostIp
             )
 
-            val data = byteArrayOf(
-                1,2,3,4,5,6,7,8
-            )
+            val data = delegate.onRequest()
 
             val socket = DatagramSocket()
             socket.broadcast = true

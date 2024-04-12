@@ -5,9 +5,13 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import good.damn.clientsocket.Application
+import good.damn.clientsocket.listeners.network.connection.DhcpConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.network.DhcpConnection
 import good.damn.clientsocket.utils.ByteUtils
@@ -16,11 +20,14 @@ import java.net.InetAddress
 import java.util.Objects
 
 class DhcpActivity
-    : AppCompatActivity() {
+    : AppCompatActivity(),
+    DhcpConnectionListener {
 
     companion object {
         private const val TAG = "DhcpActivity"
     }
+
+    private var mEditTextMsg: EditText? = null
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -29,18 +36,46 @@ class DhcpActivity
             savedInstanceState
         )
 
-        getBroadcastAddress()
-
-        val connection = DhcpConnection()
-        val a = Any()
-
-        connection.start(
-            a
+        val context = this
+        val btnConnect = Button(
+            context
         )
 
+        mEditTextMsg = EditText(
+            context
+        )
+
+        val layout = LinearLayout(
+            context
+        )
+
+        layout.orientation = LinearLayout
+            .VERTICAL
+
+        btnConnect.text = "Connect to ${getBroadcastAddress()}"
+
+        btnConnect.setOnClickListener(
+            this::onClickBtnConnect
+        )
+
+        layout.addView(
+            btnConnect,
+            -1,
+            -2
+        )
+
+        layout.addView(
+            mEditTextMsg,
+            -1,
+            -2
+        )
+
+        setContentView(
+            layout
+        )
     }
 
-    private fun getBroadcastAddress(): InetAddress {
+    private fun getBroadcastAddress(): String {
         val wifi = applicationContext.getSystemService(
             Context.WIFI_SERVICE
         ) as WifiManager
@@ -59,8 +94,24 @@ class DhcpActivity
 
         Log.d(TAG, "getBroadcastAddress: IP: ${ip.contentToString()} $inet")
 
-        return inet
+        return inet.toString()
 
     }
 
+    override fun onRequest(): ByteArray {
+        val data = mEditTextMsg?.text.toString().toByteArray(
+            Application.CHARSET_ASCII
+        )
+        return byteArrayOf(data.size.toByte()) + data
+    }
+
+}
+
+private fun DhcpActivity.onClickBtnConnect(
+    view: View
+) {
+    val connection = DhcpConnection()
+    connection.start(
+        this
+    )
 }
