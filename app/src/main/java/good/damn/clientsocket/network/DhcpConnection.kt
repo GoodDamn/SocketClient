@@ -8,8 +8,8 @@ import java.net.InetAddress
 
 class DhcpConnection
 : BaseConnection<Any>(
-    "192.168.31.255",
-    68
+    "255.255.255.255",
+    8080
 ) {
 
     companion object {
@@ -21,13 +21,13 @@ class DhcpConnection
     ) {
 
         Thread {
-
             val buf = Application.BUFFER_300
             val addr = InetAddress.getByName(
                 hostIp
             )
 
             val socket = DatagramSocket()
+            socket.broadcast = true
             val packet = DatagramPacket(
                 buf,
                 buf.size,
@@ -40,7 +40,9 @@ class DhcpConnection
                 packet
             )
 
-            val receivePacket = DatagramPacket(
+
+            socket.close()
+            /*val receivePacket = DatagramPacket(
                 buf,
                 buf.size
             )
@@ -52,6 +54,7 @@ class DhcpConnection
 
             Log.d(TAG, "onStartConnection: SOCKET_RECEIVE: ${buf.contentToString()}")
 
+            socket.close()*/
             Thread.currentThread()
                 .interrupt()
         }.start()
