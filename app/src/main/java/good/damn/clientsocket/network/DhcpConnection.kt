@@ -26,11 +26,15 @@ class DhcpConnection
                 hostIp
             )
 
+            val data = byteArrayOf(
+                1,2,3,4,5,6,7,8
+            )
+
             val socket = DatagramSocket()
             socket.broadcast = true
             val packet = DatagramPacket(
-                buf,
-                buf.size,
+                data,
+                data.size,
                 addr,
                 port
             )
@@ -39,7 +43,6 @@ class DhcpConnection
             socket.send(
                 packet
             )
-
 
             socket.close()
             /*val receivePacket = DatagramPacket(
