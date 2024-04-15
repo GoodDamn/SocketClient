@@ -1,10 +1,12 @@
 package good.damn.clientsocket.views
 
+import android.text.method.ScrollingMovementMethod
 import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.listeners.network.service.HotspotServiceListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
+import good.damn.clientsocket.messengers.Messenger
 import good.damn.clientsocket.services.network.HotspotServiceCompat
 
 class ClientView(
@@ -16,6 +18,8 @@ class ClientView(
     private var mEditTextMsg: EditText
 
     private val mHotspotService: HotspotServiceCompat
+
+    private val msgr = Messenger()
 
     var delegate: ClientViewListener? = null
 
@@ -31,12 +35,23 @@ class ClientView(
     fun createView() {
         val btnConnect = Button(context)
 
+        val textViewMsg = TextView(context)
+        textViewMsg.text = "----"
+        textViewMsg.textSize = 18f
+        textViewMsg.movementMethod = ScrollingMovementMethod()
+        textViewMsg.isVerticalScrollBarEnabled = true
+        textViewMsg.isHorizontalScrollBarEnabled = false
+
         mEditTextHost.hint = "Enter host IP"
         mEditTextMsg.hint = "Message"
 
         btnConnect.text = "Connect"
 
         orientation = VERTICAL
+
+        msgr.setTextView(
+            textViewMsg
+        )
 
         addView(
             mEditTextHost,
@@ -54,6 +69,12 @@ class ClientView(
             btnConnect,
             -1,
             -2
+        )
+
+        addView(
+            textViewMsg,
+            -1,
+            -1
         )
 
         delegate?.onCreateClientView(
@@ -83,4 +104,14 @@ class ClientView(
             "$ip1.$ip2.$ip3.$ip4"
         )
     }
+
+
+    fun addMessage(
+        msg: String
+    ) {
+        msgr.addMessage(
+            msg
+        )
+    }
+
 }

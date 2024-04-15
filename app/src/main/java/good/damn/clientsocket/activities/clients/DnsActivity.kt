@@ -18,8 +18,9 @@ class DnsActivity
     ClientViewListener,
     DnsConnectionListener {
 
-    private val msgr = Messenger()
     private var mEditTextDomain: EditText? = null
+
+    private var mClientView: ClientView? = null
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -28,15 +29,15 @@ class DnsActivity
             savedInstanceState
         )
 
-        val clientView = ClientView(
+        mClientView = ClientView(
             this
         )
 
-        clientView.delegate = this
-        clientView.createView()
+        mClientView?.delegate = this
+        mClientView?.createView()
 
         setContentView(
-            clientView
+            mClientView
         )
     }
 
@@ -52,23 +53,6 @@ class DnsActivity
         btnConnect.text = "Connect to DNS"
         editHost.hint = "DNS IP"
         editMsg.hint = "Request domain (google.com, ...)"
-
-        val textViewMsg = TextView(this)
-        textViewMsg.text = "----"
-        textViewMsg.textSize = 18f
-        textViewMsg.movementMethod = ScrollingMovementMethod()
-        textViewMsg.isVerticalScrollBarEnabled = true
-        textViewMsg.isHorizontalScrollBarEnabled = false
-
-        clientView.addView(
-            textViewMsg,
-            -1,
-            -2
-        )
-
-        msgr.setTextView(
-            textViewMsg
-        )
 
         btnConnect.setOnClickListener {
             DnsConnection(
@@ -87,7 +71,7 @@ class DnsActivity
     override fun onRawResponse(
         response: ByteArray
     ) {
-        msgr.addMessage(
+        mClientView?.addMessage(
             "RAW_RESPONSE: ${response.contentToString()}"
         )
     }
@@ -104,7 +88,7 @@ class DnsActivity
     override fun onDebugResponse(
         response: String
     ) {
-        msgr.addMessage(
+        mClientView?.addMessage(
             "DEBUG_RESPONSE: $response"
         )
     }

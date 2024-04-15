@@ -38,8 +38,9 @@ class IPPortActivity
 
     private var mTextQuery = "temp"
 
-    private var msgr = Messenger()
     private val mResponseService = ResponseService()
+
+    private var mClientView: ClientView? = null
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -48,12 +49,12 @@ class IPPortActivity
 
         mResponseService.delegate = this
 
-        val clientView = ClientView(this)
-        clientView.delegate = this
-        clientView.createView()
+        mClientView = ClientView(this)
+        mClientView?.delegate = this
+        mClientView?.createView()
 
         setContentView(
-            clientView
+            mClientView
         )
     }
 
@@ -73,14 +74,6 @@ class IPPortActivity
             this
         )
 
-        val textViewMsg = TextView(this)
-        textViewMsg.text = "----"
-        textViewMsg.textSize = 18f
-        textViewMsg.movementMethod = ScrollingMovementMethod()
-        textViewMsg.isVerticalScrollBarEnabled = true
-        textViewMsg.isHorizontalScrollBarEnabled = false
-        msgr.setTextView(textViewMsg)
-
         btnSelectFile.text = "Select file for response"
 
         btnSelectFile.setOnClickListener {
@@ -98,13 +91,7 @@ class IPPortActivity
 
         clientView.addView(
             btnSelectFile,
-            clientView.childCount - 2 // before messenger
-        )
-
-        clientView.addView(
-            textViewMsg,
-            -1,
-            -1
+            clientView.childCount - 1 // before messenger
         )
     }
 
@@ -153,7 +140,7 @@ class IPPortActivity
     override fun onConnected(
         socket: Socket
     ) {
-        msgr.addMessage(
+        mClientView?.addMessage(
             "IPv4 Client: ${socket.remoteSocketAddress}"
         )
     }
@@ -188,7 +175,7 @@ class IPPortActivity
     override fun onResponse(
         response: ByteArray
     ) {
-        msgr.addMessage(
+        mClientView?.addMessage(
             "RESPONSE_BYTES: ${response[0]}"
         )
 
@@ -206,19 +193,19 @@ class IPPortActivity
         model: Any
     ) {
         if (model is ShareModelListString) {
-            msgr.addMessage(
+            mClientView?.addMessage(
                 "RESPONSE_FILES_LIST:"
             )
 
             for (fileName in model.list) {
-                msgr.addMessage(fileName)
+                mClientView?.addMessage(fileName)
             }
             return
         }
 
 
         if (model is ShareModelFile) {
-            msgr.addMessage(
+            mClientView?.addMessage(
                 "RESPONSE_FILE: ${model.fileSize} bytes"
             )
 
