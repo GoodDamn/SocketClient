@@ -42,16 +42,43 @@ class SSHConnection(
         ) + req
 
         Thread {
-            send(data,delegate)
+            send(data)
+            receive(
+                delegate
+            )
 
             Thread.currentThread()
                 .interrupt()
         }.start()
     }
 
-    private fun send(
-        data: ByteArray,
+    private fun receive(
         delegate: SSHConnectionListener
+    ) {
+        val socket = DatagramSocket(
+            55555
+        )
+
+        val receive = DatagramPacket(
+            mBuffer,
+            mBuffer.size
+        )
+
+        Log.d(TAG, "receive: WAITING_RESPONSE")
+        socket.receive(
+            receive
+        )
+
+        Log.d(TAG, "receive: ON_RESPONSE: ${mBuffer.contentToString()}")
+        delegate.onResponse(
+            mBuffer
+        )
+
+        socket.close()
+    }
+
+    private fun send(
+        data: ByteArray
     ) {
 
         val socket = DatagramSocket()
@@ -67,20 +94,6 @@ class SSHConnection(
 
         socket.send(
             packet
-        )
-
-        val receive = DatagramPacket(
-            mBuffer,
-            mBuffer.size
-        )
-
-        socket.receive(
-            receive
-        )
-
-        Log.d(TAG, "send: ON_RESPONSE: ${mBuffer.contentToString()}")
-        delegate.onResponse(
-            mBuffer
         )
 
         socket.close()
