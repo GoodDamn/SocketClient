@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.connection.SSHConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.network.SSHConnection
@@ -86,8 +87,18 @@ class SSHActivity
             "RESPONSE:"
         )
 
+        val lenMsg = response[0]
+            .toInt()
+
+        val msg = String(
+            response,
+            1,
+            lenMsg,
+            Application.CHARSET_ASCII
+        )
+
         mClientView?.addMessage(
-            response.contentToString()
+            msg
         )
     }
 

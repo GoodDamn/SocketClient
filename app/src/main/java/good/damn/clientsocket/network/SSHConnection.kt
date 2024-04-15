@@ -69,7 +69,7 @@ class SSHConnection(
             receive
         )
 
-        Log.d(TAG, "receive: ON_RESPONSE: ${mBuffer.contentToString()}")
+        Log.d(TAG, "receive: ON_RESPONSE: ${mBuffer[0]}")
         delegate.onResponse(
             mBuffer
         )
