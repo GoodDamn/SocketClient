@@ -1,4 +1,4 @@
-package good.damn.clientsocket.activities
+package good.damn.clientsocket.activities.clients
 
 import android.net.Uri
 import android.os.Bundle

@@ -1,7 +1,6 @@
-package good.damn.clientsocket.activities
+package good.damn.clientsocket.activities.clients
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.method.ScrollingMovementMethod
 import android.widget.Button
 import android.widget.EditText

@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
-import good.damn.clientsocket.views.ClientView
+import good.damn.clientsocket.activities.clients.DhcpActivity
+import good.damn.clientsocket.activities.clients.DnsActivity
+import good.damn.clientsocket.activities.clients.IPPortActivity
+import good.damn.clientsocket.activities.clients.SSHActivity
 
 class MainActivity
     : AppCompatActivity() {
@@ -15,17 +18,6 @@ class MainActivity
         super.onCreate(savedInstanceState)
 
         val context = this
-        val btnDns = Button(
-            context
-        )
-
-        val btnIPPort = Button(
-            context
-        )
-
-        val btnDhcp = Button(
-            context
-        )
 
         val layout = LinearLayout(
             context
@@ -34,38 +26,28 @@ class MainActivity
         layout.orientation = LinearLayout
             .VERTICAL
 
-        btnDns.text = "DNS"
-        btnIPPort.text = "IP:Port"
-        btnDhcp.text = "DHCP"
-
-        btnDns.setOnClickListener(
-            this::onClickBtnDns
+        addClientButton(
+            "DNS",
+            DnsActivity::class.java,
+            layout
         )
 
-        btnIPPort.setOnClickListener(
-            this::onClickBtnIPPort
+        addClientButton(
+            "TCP",
+            IPPortActivity::class.java,
+            layout
         )
 
-        btnDhcp.setOnClickListener(
-            this::onClickBtnDhcp
+        addClientButton(
+            "DHCP",
+            DhcpActivity::class.java,
+            layout
         )
 
-        layout.addView(
-            btnDns,
-            -1,
-            -2
-        )
-
-        layout.addView(
-            btnIPPort,
-            -1,
-            -2
-        )
-
-        layout.addView(
-            btnDhcp,
-            -1,
-            -2
+        addClientButton(
+            "SSH",
+            SSHActivity::class.java,
+            layout
         )
 
         setContentView(
@@ -73,36 +55,31 @@ class MainActivity
         )
     }
 
-    private fun onClickBtnDns(
-        view: View
+    private fun addClientButton(
+        text: String,
+        activityClick: Class<*>,
+        layout: LinearLayout
     ) {
-        val intent = Intent(
-            this,
-            DnsActivity::class.java
+        val context = layout.context
+        val btnServer = Button(
+            context
         )
 
-        startActivity(intent)
-    }
+        btnServer.text = text
 
-    private fun onClickBtnIPPort(
-        view: View
-    ) {
-        val intent = Intent(
-            this,
-            IPPortActivity::class.java
+        btnServer.setOnClickListener {
+            startActivity(
+                Intent(
+                    context,
+                    activityClick
+                )
+            )
+        }
+
+        layout.addView(
+            btnServer,
+            -1,
+            -2
         )
-
-        startActivity(intent)
-    }
-
-    private fun onClickBtnDhcp(
-        view: View
-    ) {
-        val intent = Intent(
-            this,
-            DhcpActivity::class.java
-        )
-
-        startActivity(intent)
     }
 }

@@ -1,9 +1,8 @@
-package good.damn.clientsocket.activities
+package good.damn.clientsocket.activities.clients
 
 import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -12,12 +11,9 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.connection.DhcpConnectionListener
-import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.network.DhcpConnection
 import good.damn.clientsocket.utils.ByteUtils
-import good.damn.clientsocket.views.ClientView
 import java.net.InetAddress
-import java.util.Objects
 
 class DhcpActivity
     : AppCompatActivity(),
