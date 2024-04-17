@@ -50,7 +50,7 @@ class SSHActivity
         )
         mEditTextCommand = editMsg
 
-        mEditTextCommand?.hint = "Command"
+        mEditTextCommand?.hint = "command line"
         mEditTextAuth?.hint = "user@password"
 
         val buffer = ByteArray(300)
@@ -77,7 +77,7 @@ class SSHActivity
     }
 
     override fun onCommand(): String {
-        return "mkd"
+        return mEditTextCommand?.text.toString()
     }
 
     override fun onResponse(
