@@ -76,7 +76,7 @@ class SSHActivity
         return mEditTextAuth?.text.toString()
     }
 
-    override fun onCommand(): String {
+    override fun onCommandArgs(): String {
         return mEditTextCommand?.text.toString()
     }
 

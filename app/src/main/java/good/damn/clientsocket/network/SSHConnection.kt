@@ -24,22 +24,34 @@ class SSHConnection(
     override fun onStartConnection(
         delegate: SSHConnectionListener
     ) {
+
+        val req = delegate
+            .onCommandArgs()
+
+        if (req.isEmpty()) {
+            return
+        }
+
         val credentials = CryptoUtils
             .sha256(
                 delegate.onCredentials()
             )
 
-        val req = delegate
-            .onCommand()
-            .toByteArray(
-                Application.CHARSET_ASCII
-            )
+        val reqBytes = req
+            .flatMap {
+                val s = it.toByteArray(
+                    Application.CHARSET_ASCII
+                )
+                (byteArrayOf(
+                    s.size.toByte()
+                ) + s).asIterable()
+            }
 
         val data = byteArrayOf(
             credentials.size.toByte()
         ) + credentials + byteArrayOf(
             req.size.toByte()
-        ) + req
+        ) + reqBytes
 
         Thread {
             send(data)
