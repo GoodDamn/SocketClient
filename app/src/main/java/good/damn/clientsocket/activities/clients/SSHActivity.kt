@@ -76,8 +76,10 @@ class SSHActivity
         return mEditTextAuth?.text.toString()
     }
 
-    override fun onCommandArgs(): String {
+    override fun onCommandArgs(): Array<String> {
         return mEditTextCommand?.text.toString()
+            .split("\\s+".toRegex())
+            .toTypedArray()
     }
 
     override fun onResponse(
