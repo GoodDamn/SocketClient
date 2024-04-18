@@ -3,12 +3,11 @@ package good.damn.clientsocket.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import good.damn.clientsocket.activities.clients.DhcpActivity
 import good.damn.clientsocket.activities.clients.DnsActivity
-import good.damn.clientsocket.activities.clients.IPPortActivity
+import good.damn.clientsocket.activities.clients.ShareProtocolActivity
 import good.damn.clientsocket.activities.clients.SSHActivity
 
 class MainActivity
@@ -34,7 +33,7 @@ class MainActivity
 
         addClientButton(
             "TCP",
-            IPPortActivity::class.java,
+            ShareProtocolActivity::class.java,
             layout
         )
 

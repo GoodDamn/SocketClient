@@ -2,22 +2,23 @@ package good.damn.clientsocket.activities.clients
 
 import android.net.Uri
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.TextView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
+import good.damn.clientsocket.Application
 import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.builder.shareProtocol.ShareRequestBuilder
 import good.damn.clientsocket.listeners.network.connection.ConnectionListener
 import good.damn.clientsocket.listeners.network.service.ResponseServiceListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
-import good.damn.clientsocket.messengers.Messenger
-import good.damn.clientsocket.network.ShareProtocolConnection
+import good.damn.clientsocket.network.SSLShareConnection
+import good.damn.clientsocket.network.ShareConnection
 import good.damn.clientsocket.services.response.ResponseService
 import good.damn.clientsocket.shareProtocol.ShareModelFile
 import good.damn.clientsocket.shareProtocol.ShareModelListString
@@ -27,7 +28,7 @@ import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
 import java.net.Socket
 
-class IPPortActivity
+class ShareProtocolActivity
     : AppCompatActivity(),
     ClientViewListener,
     ActivityResultCallback<Uri?>,
@@ -39,7 +40,6 @@ class IPPortActivity
     private var mTextQuery = "temp"
 
     private val mResponseService = ResponseService()
-
     private var mClientView: ClientView? = null
 
     override fun onCreate(
@@ -70,10 +70,22 @@ class IPPortActivity
             this
         )
 
+        val horizontalLayout = LinearLayout(
+            this
+        )
+
         val btnSelectFile = Button(
             this
         )
 
+        val checkBoxSSL = CheckBox(
+            this
+        )
+
+        horizontalLayout.orientation = LinearLayout
+            .HORIZONTAL
+
+        checkBoxSSL.text = "SSL"
         btnSelectFile.text = "Select file for response"
 
         btnSelectFile.setOnClickListener {
@@ -81,16 +93,34 @@ class IPPortActivity
         }
 
         btnConnect.setOnClickListener {
-            ShareProtocolConnection(
+            if (checkBoxSSL.isChecked) {
+                SSLShareConnection(
+                    editHost.text.toString()
+                ).start(this)
+                return@setOnClickListener
+            }
+
+            ShareConnection(
                 editHost.text.toString()
             ).start(this)
         }
 
-        btnSelectFile.layoutParams = ViewGroup
+        horizontalLayout.layoutParams = ViewGroup
             .LayoutParams(-1,-2)
 
-        clientView.addView(
+        horizontalLayout.addView(
             btnSelectFile,
+            (Application.WIDTH * 0.4f).toInt(),
+            -2
+        )
+
+        horizontalLayout.addView(
+            checkBoxSSL,
+            -2,-2
+        )
+
+        clientView.addView(
+            horizontalLayout,
             clientView.childCount - 1 // before messenger
         )
     }

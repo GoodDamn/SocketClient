@@ -27,7 +27,7 @@
         </activity>
 
         <activity android:name=".activities.clients.DnsActivity"/>
-        <activity android:name=".activities.clients.IPPortActivity"/>
+        <activity android:name=".activities.clients.ShareProtocolActivity"/>
         <activity android:name=".activities.clients.DhcpActivity"/>
         <activity android:name=".activities.clients.SSHActivity"/>
 
