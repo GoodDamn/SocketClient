@@ -54,7 +54,7 @@ class SSHConnection(
                 byteArrayOf(
                     1
                 ) + ByteUtils.short(rsaKey.size) + rsaKey
-            else ByteArray(0);
+            else ByteArray(0)
 
         data += byteArrayOf(
             credentials.size.toByte()

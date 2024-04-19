@@ -1,27 +1,35 @@
 package good.damn.clientsocket.activities.clients
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.activity.result.ActivityResultCallback
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.Application
+import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.network.connection.SSHConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.network.SSHConnection
+import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
 
 class SSHActivity
 : AppCompatActivity(),
     ClientViewListener,
-    SSHConnectionListener {
+    SSHConnectionListener,
+    ActivityResultCallback<Uri?> {
 
     private var mClientView: ClientView? = null
 
     private var mEditTextAuth: EditText? = null
     private var mEditTextCommand: EditText? = null
+
+    private var mRsaKey = ByteArray(0)
+    private var mBtnKey: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +61,21 @@ class SSHActivity
         mEditTextCommand?.hint = "command line"
         mEditTextAuth?.hint = "user@password"
 
-        val buffer = ByteArray(300)
+        mBtnKey = Button(
+            this
+        )
+        mBtnKey?.text = "Load RSA key"
+
+        val contentBrowser = ContentLauncher(
+            this,
+            this
+        )
+
+        mBtnKey?.setOnClickListener {
+            contentBrowser.launch("*/*")
+        }
+
+        val buffer = ByteArray(4096)
         btnConnect.setOnClickListener {
             SSHConnection(
                 editHost.text.toString(),
@@ -61,6 +83,9 @@ class SSHActivity
                 buffer
             ).start(this)
         }
+
+        mBtnKey?.layoutParams = ViewGroup
+            .LayoutParams(-1,-2)
 
         mEditTextAuth?.layoutParams = ViewGroup
             .LayoutParams(-1,-2)
@@ -70,6 +95,10 @@ class SSHActivity
             mClientView!!.childCount - 1
         )
 
+        mClientView?.addView(
+            mBtnKey,
+            mClientView!!.childCount - 1
+        )
     }
 
     override fun onCredentials(): String {
@@ -83,7 +112,7 @@ class SSHActivity
     }
 
     override fun keyRSA(): ByteArray {
-        return ByteArray(0)
+        return mRsaKey
     }
 
     override fun onResponse(
@@ -106,6 +135,22 @@ class SSHActivity
         mClientView?.addMessage(
             msg
         )
+    }
+
+    override fun onActivityResult(
+        result: Uri?
+    ) {
+        val k = FileUtils
+            .read(result, this)
+
+        if (k == null) {
+            mBtnKey?.text = "Load RSA key"
+            mRsaKey = ByteArray(0)
+            return
+        }
+
+        mBtnKey?.text = "RSA Key attached"
+        mRsaKey = k
     }
 
 }
