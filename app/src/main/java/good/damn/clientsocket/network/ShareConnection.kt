@@ -65,7 +65,11 @@ class ShareConnection(
             val out = socket.getOutputStream()
             val inp = socket.getInputStream()
 
-
+            observe(
+                delegate,
+                out,
+                inp
+            )
 
             Thread.currentThread()
                 .interrupt()

@@ -1,13 +1,15 @@
 package good.damn.clientsocket.network
 
 import good.damn.clientsocket.listeners.network.connection.ConnectionListener
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
 class SSLShareConnection(
     hostIp: String
 ): BaseConnection<ConnectionListener>(
     hostIp,
-    443
+    4443
 ) {
 
     override fun onStartConnection(
@@ -15,13 +17,13 @@ class SSLShareConnection(
     ) {
         Thread {
 
-            val factory = SSLSocketFactory
+            val socket = SSLContext
                 .getDefault()
-
-            val socket = factory.createSocket(
-                hostIp,
-                port
-            )
+                .socketFactory
+                .createSocket(
+                    hostIp,
+                    port
+                )
 
             val inp = socket.getInputStream()
             val out = socket.getOutputStream()
