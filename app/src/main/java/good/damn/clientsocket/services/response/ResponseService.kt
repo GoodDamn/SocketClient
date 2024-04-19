@@ -17,6 +17,7 @@ class ResponseService {
         private const val RESPONSE_ID_LIST = 426
         private const val RESPONSE_ID_GET_FILE = 410
         private const val RESPONSE_ID_MESSAGE = 1
+        private const val RESPONSE_ID_MESSAGE16 = 2
     }
 
     var delegate: ResponseServiceListener? = null
@@ -27,6 +28,24 @@ class ResponseService {
     > = HashMap()
 
     init {
+
+
+        mResponses[RESPONSE_ID_MESSAGE16] = {
+            val msgLen = ByteUtils.short(
+                it,
+                4
+            )
+
+            delegate?.onModelResponse(
+                String(
+                    it,
+                    6,
+                    msgLen,
+                    Application.CHARSET_ASCII
+                )
+            )
+        }
+
 
         mResponses[RESPONSE_ID_MESSAGE] = {
             val msgLen = it[4]

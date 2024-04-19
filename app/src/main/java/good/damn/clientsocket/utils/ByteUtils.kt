@@ -44,6 +44,14 @@ class ByteUtils {
             return result
         }
 
+        fun short(
+            buf: ByteArray,
+            off: Int
+        ): Int {
+            return (buf[off].toInt() and 0xff shl 8) or
+            (buf[off+1].toInt() and 0xff)
+        }
+
         fun integer(i: Int): ByteArray {
             return byteArrayOf(
                 ((i shr 24) and 0xff).toByte(),
