@@ -8,6 +8,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketTimeoutException
 
 class ShareConnection(
     hostIp: String
@@ -48,31 +49,39 @@ class ShareConnection(
     override fun onStartConnection(
         delegate: ConnectionListener
     ) {
-        Thread {
-            val socket = Socket()
-            val address = InetSocketAddress(
-                hostIp,
-                port
-            )
 
-            socket.connect(
-                address,
-                5000
-            )
+            Thread {
+                try {
+                    val socket = Socket()
+                    val address = InetSocketAddress(
+                        hostIp,
+                        port
+                    )
 
-            delegate.onConnected(socket)
+                    socket.connect(
+                        address,
+                        5000
+                    )
 
-            val out = socket.getOutputStream()
-            val inp = socket.getInputStream()
+                    delegate.onConnected(socket)
 
-            observe(
-                delegate,
-                out,
-                inp
-            )
+                    val out = socket.getOutputStream()
+                    val inp = socket.getInputStream()
 
-            Thread.currentThread()
-                .interrupt()
-        }.start()
+                    observe(
+                        delegate,
+                        out,
+                        inp
+                    )
+
+                } catch (e: java.lang.Exception) {
+                    delegate.onDebugMessage(
+                        e.message ?: "Exception"
+                    )
+                }
+
+                Thread.currentThread()
+                    .interrupt()
+            }.start()
     }
 }

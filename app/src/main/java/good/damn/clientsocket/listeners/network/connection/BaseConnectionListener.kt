@@ -11,4 +11,9 @@ interface BaseConnectionListener {
     fun onResponse(
         response: ByteArray
     )
+
+    @WorkerThread
+    fun onDebugMessage(
+        msg: String
+    )
 }

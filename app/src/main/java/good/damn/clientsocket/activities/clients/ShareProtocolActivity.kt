@@ -140,6 +140,13 @@ class ShareProtocolActivity
     }
 
     @WorkerThread
+    override fun onDebugMessage(msg: String) {
+        mClientView?.addMessage(
+            msg
+        )
+    }
+
+    @WorkerThread
     override fun onResponse(
         response: ByteArray
     ) {
