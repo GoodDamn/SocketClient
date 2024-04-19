@@ -82,6 +82,10 @@ class SSHActivity
             .toTypedArray()
     }
 
+    override fun keyRSA(): ByteArray {
+        return ByteArray(0)
+    }
+
     override fun onResponse(
         response: ByteArray
     ) {

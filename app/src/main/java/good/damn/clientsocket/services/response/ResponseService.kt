@@ -29,7 +29,6 @@ class ResponseService {
 
     init {
 
-
         mResponses[RESPONSE_ID_MESSAGE16] = {
             val msgLen = ByteUtils.short(
                 it,
@@ -45,7 +44,6 @@ class ResponseService {
                 )
             )
         }
-
 
         mResponses[RESPONSE_ID_MESSAGE] = {
             val msgLen = it[4]

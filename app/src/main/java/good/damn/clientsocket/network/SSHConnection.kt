@@ -3,6 +3,7 @@ package good.damn.clientsocket.network
 import android.util.Log
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.listeners.network.connection.SSHConnectionListener
+import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.CryptoUtils
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -28,7 +29,7 @@ class SSHConnection(
         val req = delegate
             .onCommandArgs()
 
-        if (req.isEmpty()) {
+        if (req.isEmpty() || req[0].isEmpty()) {
             return
         }
 
@@ -36,6 +37,8 @@ class SSHConnection(
             .sha256(
                 delegate.onCredentials()
             )
+
+        val rsaKey = delegate.keyRSA()
 
         val reqBytes = req
             .flatMap {
@@ -47,7 +50,13 @@ class SSHConnection(
                 ) + s).asIterable()
             }
 
-        val data = byteArrayOf(
+        var data = if (rsaKey.isNotEmpty())
+                byteArrayOf(
+                    1
+                ) + ByteUtils.short(rsaKey.size) + rsaKey
+            else ByteArray(0);
+
+        data += byteArrayOf(
             credentials.size.toByte()
         ) + credentials + byteArrayOf(
             req.size.toByte()
