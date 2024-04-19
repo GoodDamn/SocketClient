@@ -12,7 +12,6 @@ class ByteUtils {
             charset: Charset,
             offset: Int = 0
         ): ByteArray {
-
             val baos = ByteArrayOutputStream()
 
             val factCount = list.size - offset
@@ -21,11 +20,9 @@ class ByteUtils {
                 return ByteArray(0)
             }
 
-            if (factCount != 1) {
-                baos.write( // List count (0-255)
-                    factCount
-                )
-            }
+            baos.write( // List count (0-255)
+                factCount
+            )
 
             for (i in offset until list.size) {
                 val bytes = list[i].toByteArray(

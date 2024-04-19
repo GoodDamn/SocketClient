@@ -31,7 +31,6 @@ import java.net.Socket
 class ShareProtocolActivity
     : AppCompatActivity(),
     ClientViewListener,
-    ActivityResultCallback<Uri?>,
     ConnectionListener,
     ResponseServiceListener {
 
@@ -65,16 +64,8 @@ class ShareProtocolActivity
         clientView: ClientView
     ) {
         mEditTextRequest = editMsg
-        val contentLauncher = ContentLauncher(
-            this,
-            this
-        )
 
         val horizontalLayout = LinearLayout(
-            this
-        )
-
-        val btnSelectFile = Button(
             this
         )
 
@@ -86,11 +77,6 @@ class ShareProtocolActivity
             .HORIZONTAL
 
         checkBoxSSL.text = "SSL"
-        btnSelectFile.text = "Select file for response"
-
-        btnSelectFile.setOnClickListener {
-            contentLauncher.launch("*/*")
-        }
 
         btnConnect.setOnClickListener {
             if (checkBoxSSL.isChecked) {
@@ -109,12 +95,6 @@ class ShareProtocolActivity
             .LayoutParams(-1,-2)
 
         horizontalLayout.addView(
-            btnSelectFile,
-            (Application.WIDTH * 0.4f).toInt(),
-            -2
-        )
-
-        horizontalLayout.addView(
             checkBoxSSL,
             -2,-2
         )
@@ -125,7 +105,97 @@ class ShareProtocolActivity
         )
     }
 
-    override fun onActivityResult(
+    @WorkerThread
+    override fun onConnected(
+        socket: Socket
+    ) {
+        mClientView?.addMessage(
+            "Connected to server!"
+        )
+    }
+
+    @WorkerThread
+    override fun onRequest(): ByteArray {
+        if (mEditTextRequest == null) {
+            return ByteArray(0)
+        }
+
+        val params = mEditTextRequest!!.text.split(
+            "\\s+".toRegex()
+        )
+
+        mTextQuery = mEditTextRequest!!.text.toString()
+
+        val shareRequest = ShareRequestBuilder()
+            .setMethod(ShareRequestMethod(
+                params[0]
+            ))
+            .setBody(ShareRequestBodyArgs(
+                params,
+                1
+            ))
+            .build() ?: return ByteArray(0)
+
+        return shareRequest.toByteArray()
+    }
+
+    @WorkerThread
+    override fun onResponse(
+        response: ByteArray
+    ) {
+        if (response.isEmpty()) {
+            mClientView?.addMessage(
+                "No response"
+            )
+            return
+        }
+
+        mResponseService.decodeResponse(
+            response
+        )
+    }
+
+    @WorkerThread
+    override fun onModelResponse(
+        model: Any
+    ) {
+        if (model is String) {
+            mClientView?.addMessage(
+                model
+            )
+            return
+        }
+
+        if (model is ShareModelListString) {
+            mClientView?.addMessage(
+                "RESPONSE_FILES_LIST:"
+            )
+
+            for (fileName in model.list) {
+                mClientView?.addMessage(fileName)
+            }
+            return
+        }
+
+
+        if (model is ShareModelFile) {
+            mClientView?.addMessage(
+                "RESPONSE_FILE: ${model.fileSize} bytes"
+            )
+
+            FileUtils.writeToDoc(
+                mTextQuery,
+                model.file,
+                model.filePosition
+            )
+            return
+        }
+
+    }
+
+}
+
+/*override fun onActivityResult(
         uri: Uri?
     ) {
         val activity = this
@@ -164,88 +234,4 @@ class ShareProtocolActivity
             "FILE IS PREPARED $fileName",
             Toast.LENGTH_SHORT)
             .show()
-    }
-
-    @WorkerThread
-    override fun onConnected(
-        socket: Socket
-    ) {
-        mClientView?.addMessage(
-            "IPv4 Client: ${socket.remoteSocketAddress}"
-        )
-    }
-
-    @WorkerThread
-    override fun onRequest(): ByteArray {
-
-        if (mEditTextRequest == null) {
-            return ByteArray(0)
-        }
-
-        val params = mEditTextRequest!!.text.split(
-            "\\s+".toRegex()
-        )
-
-        mTextQuery = mEditTextRequest!!.text.toString()
-
-        val shareRequest = ShareRequestBuilder()
-            .setMethod(ShareRequestMethod(
-                params[0]
-            ))
-            .setBody(ShareRequestBodyArgs(
-                params,
-                1
-            ))
-            .build() ?: return ByteArray(0)
-
-        return shareRequest.toByteArray()
-    }
-
-    @WorkerThread
-    override fun onResponse(
-        response: ByteArray
-    ) {
-        mClientView?.addMessage(
-            "RESPONSE_BYTES: ${response[0]}"
-        )
-
-        if (response.isEmpty()) {
-            return
-        }
-
-        mResponseService.decodeResponse(
-            response
-        )
-    }
-
-    @WorkerThread
-    override fun onModelResponse(
-        model: Any
-    ) {
-        if (model is ShareModelListString) {
-            mClientView?.addMessage(
-                "RESPONSE_FILES_LIST:"
-            )
-
-            for (fileName in model.list) {
-                mClientView?.addMessage(fileName)
-            }
-            return
-        }
-
-
-        if (model is ShareModelFile) {
-            mClientView?.addMessage(
-                "RESPONSE_FILE: ${model.fileSize} bytes"
-            )
-
-            FileUtils.writeToDoc(
-                mTextQuery,
-                model.file,
-                model.filePosition
-            )
-            return
-        }
-    }
-
-}
+    }*/
