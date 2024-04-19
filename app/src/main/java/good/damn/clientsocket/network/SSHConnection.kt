@@ -22,14 +22,23 @@ class SSHConnection(
         private const val TAG = "SSHConnection"
     }
 
+    private var mSocketReceive: DatagramSocket? = null
+    private var mSocketSend: DatagramSocket? = null
+
     override fun onStartConnection(
         delegate: SSHConnectionListener
     ) {
+        delegate.onStartConnection()
+        mSocketReceive?.close()
+        mSocketSend?.close()
 
         val req = delegate
             .onCommandArgs()
 
         if (req.isEmpty() || req[0].isEmpty()) {
+            delegate.onDebugConnection(
+                "Command with args are emtpy"
+            )
             return
         }
 
@@ -62,12 +71,27 @@ class SSHConnection(
             req.size.toByte()
         ) + reqBytes
 
+        delegate.onDebugConnection(
+            "Sending data"
+        )
+
         Thread {
-            send(data)
+            delegate.onDebugConnection(
+                "Waiting response"
+            )
+
             receive(
                 delegate
             )
+            Thread.currentThread()
+                .interrupt()
+        }.start()
 
+        Thread {
+            send(data)
+            delegate.onDebugConnection(
+                "Data sent"
+            )
             Thread.currentThread()
                 .interrupt()
         }.start()
@@ -76,7 +100,7 @@ class SSHConnection(
     private fun receive(
         delegate: SSHConnectionListener
     ) {
-        val socket = DatagramSocket(
+        mSocketReceive = DatagramSocket(
             55555
         )
 
@@ -86,7 +110,7 @@ class SSHConnection(
         )
 
         Log.d(TAG, "receive: WAITING_RESPONSE")
-        socket.receive(
+        mSocketReceive?.receive(
             receive
         )
 
@@ -95,14 +119,15 @@ class SSHConnection(
             mBuffer
         )
 
-        socket.close()
+        mSocketReceive?.close()
+        mSocketReceive = null
     }
 
     private fun send(
         data: ByteArray
     ) {
 
-        val socket = DatagramSocket()
+        mSocketSend = DatagramSocket()
 
         val packet = DatagramPacket(
             data,
@@ -113,11 +138,12 @@ class SSHConnection(
             port
         )
 
-        socket.send(
+        mSocketSend?.send(
             packet
         )
 
-        socket.close()
+        mSocketSend?.close()
+        mSocketSend = null
     }
 
 }

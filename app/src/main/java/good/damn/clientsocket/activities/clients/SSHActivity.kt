@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultCallback
+import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import good.damn.clientsocket.Application
 import good.damn.clientsocket.ContentLauncher
@@ -98,6 +99,29 @@ class SSHActivity
         mClientView?.addView(
             mBtnKey,
             mClientView!!.childCount - 1
+        )
+    }
+
+    @WorkerThread
+    override fun onStartConnection() {
+        mClientView?.addMessage(
+            "Connection started"
+        )
+    }
+
+    @WorkerThread
+    override fun onDebugConnection(
+        msg: String
+    ) {
+        mClientView?.addMessage(
+            msg
+        )
+    }
+
+    @WorkerThread
+    override fun onEndConnection() {
+        mClientView?.addMessage(
+            "Connection ended"
         )
     }
 
