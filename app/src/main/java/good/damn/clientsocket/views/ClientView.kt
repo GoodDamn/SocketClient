@@ -45,6 +45,8 @@ class ClientView(
         mEditTextHost.hint = "Enter host IP"
         mEditTextMsg.hint = "Message"
 
+        mEditTextMsg.maxLines = 1
+
         btnConnect.text = "Connect"
 
         orientation = VERTICAL

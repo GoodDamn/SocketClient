@@ -5,10 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
-import good.damn.clientsocket.activities.clients.DhcpActivity
-import good.damn.clientsocket.activities.clients.DnsActivity
-import good.damn.clientsocket.activities.clients.ShareProtocolActivity
-import good.damn.clientsocket.activities.clients.SSHActivity
+import good.damn.clientsocket.activities.clients.*
 
 class MainActivity
     : AppCompatActivity() {
