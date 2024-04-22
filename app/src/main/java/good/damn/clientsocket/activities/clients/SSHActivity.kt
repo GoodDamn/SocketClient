@@ -15,6 +15,7 @@ import good.damn.clientsocket.ContentLauncher
 import good.damn.clientsocket.listeners.network.connection.SSHConnectionListener
 import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.network.SSHConnection
+import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
 
@@ -23,6 +24,12 @@ class SSHActivity
     ClientViewListener,
     SSHConnectionListener,
     ActivityResultCallback<Uri?> {
+
+
+    companion object {
+        private const val RESPONSE_ID_MESSAGE = 1
+        private const val RESPONSE_ID_MESSAGE16 = 2
+    }
 
     private var mClientView: ClientView? = null
 
@@ -146,12 +153,30 @@ class SSHActivity
             "RESPONSE:"
         )
 
-        val lenMsg = response[0]
-            .toInt()
+        val responseID = ByteUtils
+            .integer(response)
+
+        var lenMsg = 0
+        var offsetMsg = 0
+
+        when (responseID) {
+            RESPONSE_ID_MESSAGE -> {
+                lenMsg = response[4]
+                    .toInt()
+                offsetMsg = 5
+            }
+            RESPONSE_ID_MESSAGE16 -> {
+                lenMsg = ByteUtils.short(
+                    response,
+                    4
+                )
+                offsetMsg = 6
+            }
+        }
 
         val msg = String(
             response,
-            1,
+            offsetMsg,
             lenMsg,
             Application.CHARSET_ASCII
         )

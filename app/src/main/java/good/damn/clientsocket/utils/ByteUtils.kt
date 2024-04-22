@@ -70,7 +70,7 @@ class ByteUtils {
 
         fun integer(
             buf: ByteArray,
-            off: Int
+            off: Int = 0
         ): Int {
             return (buf[off].toInt() and 0xff shl 24) or
                     (buf[off+1].toInt() and 0xff shl 16) or
