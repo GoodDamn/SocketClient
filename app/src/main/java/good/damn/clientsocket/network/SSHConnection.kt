@@ -20,17 +20,31 @@ class SSHConnection(
 
     companion object {
         private const val TAG = "SSHConnection"
+
+        const val PORT_LOOP = 55556
+        const val PORT_RECEIVE = 55555
     }
+
+    private val mBufferLoop = ByteArray(255)
 
     private var mSocketReceive: DatagramSocket? = null
     private var mSocketSend: DatagramSocket? = null
+    private var mSocketReceiveLoop: DatagramSocket? = null
+
+    private var mIsReceiveClosed = true
+    private var mIsReceiveLoopClosed = true
 
     override fun onStartConnection(
         delegate: SSHConnectionListener
     ) {
         delegate.onStartConnection()
-        mSocketReceive?.close()
-        mSocketSend?.close()
+        if (!mIsReceiveClosed) {
+            mSocketReceive?.close()
+        }
+
+        if (!mIsReceiveClosed) {
+            mSocketReceiveLoop?.close()
+        }
 
         val req = delegate
             .onCommandArgs()
@@ -92,6 +106,11 @@ class SSHConnection(
             delegate.onDebugConnection(
                 "Data sent"
             )
+
+            receiveLoop(
+                delegate
+            )
+
             Thread.currentThread()
                 .interrupt()
         }.start()
@@ -101,8 +120,10 @@ class SSHConnection(
         delegate: SSHConnectionListener
     ) {
         mSocketReceive = DatagramSocket(
-            55555
+            PORT_RECEIVE
         )
+        mSocketReceive?.reuseAddress = true
+        mIsReceiveClosed = false
 
         val receive = DatagramPacket(
             mBuffer,
@@ -114,13 +135,64 @@ class SSHConnection(
             receive
         )
 
-        Log.d(TAG, "receive: ON_RESPONSE: ${mBuffer[0]}")
         delegate.onResponse(
             mBuffer
         )
 
         mSocketReceive?.close()
+        mIsReceiveClosed = true
         mSocketReceive = null
+    }
+
+    private fun receiveLoop(
+        delegate: SSHConnectionListener
+    ) {
+        mSocketReceiveLoop = DatagramSocket(
+            PORT_LOOP
+        )
+        mSocketReceiveLoop?.reuseAddress = true
+        mIsReceiveLoopClosed = false
+
+        val packet = DatagramPacket(
+            mBufferLoop,
+            mBufferLoop.size
+        )
+
+        Log.d(TAG, "receiveLoop: PREPARE")
+        
+        while (true) {
+            Log.d(TAG, "receiveLoop: SOCKET: $mSocketReceiveLoop")
+            if (mSocketReceiveLoop == null) {
+                break
+            }
+
+            Log.d(TAG, "receiveLoop: WAITING_PACKET:")
+            mSocketReceiveLoop?.receive(
+                packet
+            )
+
+            Log.d(TAG, "receiveLoop: CHECK: ${mBufferLoop[0]}")
+            
+            if (mBufferLoop[0].toInt() == -1) {
+                Log.d(TAG, "receiveLoop: END")
+                // eop (end of packet)
+                break
+            }
+
+            Log.d(TAG, "receiveLoop: RESPONSE")
+            delegate.onDebugConnection(
+                String(
+                    mBufferLoop,
+                    Application.CHARSET_ASCII
+                )
+            )
+
+        }
+
+
+        mSocketReceiveLoop?.close()
+        mIsReceiveLoopClosed = true
+        mSocketReceiveLoop = null
     }
 
     private fun send(
