@@ -2,6 +2,7 @@ package good.damn.clientsocket.network
 
 import android.util.Log
 import good.damn.clientsocket.Application
+import good.damn.clientsocket.factory.SocketFactory
 import good.damn.clientsocket.listeners.network.connection.SSHConnectionListener
 import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.CryptoUtils
@@ -20,31 +21,26 @@ class SSHConnection(
 
     companion object {
         private const val TAG = "SSHConnection"
-
         const val PORT_LOOP = 55556
         const val PORT_RECEIVE = 55555
+
+        private val mSocketReceiveLoop = DatagramSocket(
+            PORT_LOOP
+        )
+
+        private val mSocketReceive = DatagramSocket(
+            PORT_RECEIVE
+        )
     }
 
     private val mBufferLoop = ByteArray(255)
 
-    private var mSocketReceive: DatagramSocket? = null
     private var mSocketSend: DatagramSocket? = null
-    private var mSocketReceiveLoop: DatagramSocket? = null
-
-    private var mIsReceiveClosed = true
-    private var mIsReceiveLoopClosed = true
 
     override fun onStartConnection(
         delegate: SSHConnectionListener
     ) {
         delegate.onStartConnection()
-        if (!mIsReceiveClosed) {
-            mSocketReceive?.close()
-        }
-
-        if (!mIsReceiveClosed) {
-            mSocketReceiveLoop?.close()
-        }
 
         val req = delegate
             .onCommandArgs()
@@ -102,28 +98,25 @@ class SSHConnection(
         }.start()
 
         Thread {
+            delegate.onDebugConnection(
+                "RECEIVE_LOOP"
+            )
+            receiveLoop(
+                delegate
+            )
+        }.start()
+
+        Thread {
             send(data)
             delegate.onDebugConnection(
                 "Data sent"
             )
-
-            receiveLoop(
-                delegate
-            )
-
-            Thread.currentThread()
-                .interrupt()
         }.start()
     }
 
     private fun receive(
         delegate: SSHConnectionListener
     ) {
-        mSocketReceive = DatagramSocket(
-            PORT_RECEIVE
-        )
-        mSocketReceive?.reuseAddress = true
-        mIsReceiveClosed = false
 
         val receive = DatagramPacket(
             mBuffer,
@@ -131,43 +124,26 @@ class SSHConnection(
         )
 
         Log.d(TAG, "receive: WAITING_RESPONSE")
-        mSocketReceive?.receive(
+        mSocketReceive.receive(
             receive
         )
 
         delegate.onResponse(
             mBuffer
         )
-
-        mSocketReceive?.close()
-        mIsReceiveClosed = true
-        mSocketReceive = null
     }
 
     private fun receiveLoop(
         delegate: SSHConnectionListener
     ) {
-        mSocketReceiveLoop = DatagramSocket(
-            PORT_LOOP
-        )
-        mSocketReceiveLoop?.reuseAddress = true
-        mIsReceiveLoopClosed = false
-
         val packet = DatagramPacket(
             mBufferLoop,
             mBufferLoop.size
         )
 
-        Log.d(TAG, "receiveLoop: PREPARE")
-        
         while (true) {
             Log.d(TAG, "receiveLoop: SOCKET: $mSocketReceiveLoop")
-            if (mSocketReceiveLoop == null) {
-                break
-            }
-
-            Log.d(TAG, "receiveLoop: WAITING_PACKET:")
-            mSocketReceiveLoop?.receive(
+            mSocketReceiveLoop.receive(
                 packet
             )
 
@@ -175,24 +151,23 @@ class SSHConnection(
             
             if (mBufferLoop[0].toInt() == -1) {
                 Log.d(TAG, "receiveLoop: END")
+                delegate.onStreamResponse(
+                    "EOS"
+                )
                 // eop (end of packet)
                 break
             }
 
             Log.d(TAG, "receiveLoop: RESPONSE")
-            delegate.onDebugConnection(
+            delegate.onStreamResponse(
                 String(
                     mBufferLoop,
-                    Application.CHARSET_ASCII
+                    Application.CHARSET
                 )
             )
 
         }
 
-
-        mSocketReceiveLoop?.close()
-        mIsReceiveLoopClosed = true
-        mSocketReceiveLoop = null
     }
 
     private fun send(

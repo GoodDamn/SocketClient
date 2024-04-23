@@ -146,6 +146,15 @@ class SSHActivity
         return mRsaKey
     }
 
+    override fun onStreamResponse(
+        msg: String
+    ) {
+        mClientView?.addMessage(
+            msg,
+            false
+        )
+    }
+
     override fun onResponse(
         response: ByteArray
     ) {

@@ -9,12 +9,17 @@ import java.nio.charset.Charset
 class Messenger {
 
     private var mTextView: TextView? = null
+    private var mIndex = 0
     private var messages = ""
 
     fun addMessage(
-        text: String
+        text: String,
+        indexed: Boolean = true
     ) {
-        messages += "$text\n"
+        messages += if (indexed)
+            "${mIndex++}) $text\n"
+        else "$text\n"
+
         mTextView?.let {
             Application.ui {
                 it.text = messages

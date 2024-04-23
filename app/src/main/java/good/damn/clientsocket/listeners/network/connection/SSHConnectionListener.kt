@@ -6,6 +6,10 @@ interface SSHConnectionListener {
         msg: String
     )
 
+    fun onStreamResponse(
+        msg: String
+    )
+
     fun onStartConnection()
     fun onCredentials(): String
     fun keyRSA(): ByteArray

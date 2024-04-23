@@ -37,7 +37,7 @@ class ClientView(
 
         val textViewMsg = TextView(context)
         textViewMsg.text = "----"
-        textViewMsg.textSize = 18f
+        textViewMsg.textSize = 10f
         textViewMsg.movementMethod = ScrollingMovementMethod()
         textViewMsg.isVerticalScrollBarEnabled = true
         textViewMsg.isHorizontalScrollBarEnabled = false
@@ -109,10 +109,12 @@ class ClientView(
 
 
     fun addMessage(
-        msg: String
+        msg: String,
+        indexed: Boolean = true
     ) {
         msgr.addMessage(
-            msg
+            msg,
+            indexed
         )
     }
 
