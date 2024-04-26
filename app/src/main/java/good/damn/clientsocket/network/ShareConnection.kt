@@ -49,7 +49,6 @@ class ShareConnection(
     override fun onStartConnection(
         delegate: ConnectionListener
     ) {
-
             Thread {
                 try {
                     val socket = Socket()

@@ -36,7 +36,7 @@ class FileUtils {
         fun writeToDoc(
             fileName: String,
             data: ByteArray,
-            offset: Int
+            offset: Int = 0
         ): String? {
             val dir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOCUMENTS

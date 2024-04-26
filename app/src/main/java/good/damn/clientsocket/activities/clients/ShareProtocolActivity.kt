@@ -20,10 +20,8 @@ import good.damn.clientsocket.listeners.view.ClientViewListener
 import good.damn.clientsocket.network.SSLShareConnection
 import good.damn.clientsocket.network.ShareConnection
 import good.damn.clientsocket.services.response.ResponseService
-import good.damn.clientsocket.shareProtocol.ShareModelFile
-import good.damn.clientsocket.shareProtocol.ShareModelListString
-import good.damn.clientsocket.shareProtocol.ShareRequestBodyArgs
-import good.damn.clientsocket.shareProtocol.ShareRequestMethod
+import good.damn.clientsocket.shareProtocol.*
+import good.damn.clientsocket.utils.ByteUtils
 import good.damn.clientsocket.utils.FileUtils
 import good.damn.clientsocket.views.ClientView
 import java.net.Socket
@@ -32,7 +30,8 @@ class ShareProtocolActivity
     : AppCompatActivity(),
     ClientViewListener,
     ConnectionListener,
-    ResponseServiceListener {
+    ResponseServiceListener,
+    ActivityResultCallback<Uri?> {
 
     private var mEditTextRequest: EditText? = null
 
@@ -40,6 +39,8 @@ class ShareProtocolActivity
 
     private val mResponseService = ResponseService()
     private var mClientView: ClientView? = null
+
+    private val mFiles = HashMap<String, ByteArray>()
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -73,10 +74,24 @@ class ShareProtocolActivity
             this
         )
 
+        val btnLoadFile = Button(
+            this
+        )
+
+        val content = ContentLauncher(
+            this,
+            this
+        )
+
         horizontalLayout.orientation = LinearLayout
             .HORIZONTAL
 
+        btnLoadFile.text  = "Load file"
         checkBoxSSL.text = "SSL"
+
+        btnLoadFile.setOnClickListener {
+            content.launch("*/*")
+        }
 
         btnConnect.setOnClickListener {
             if (checkBoxSSL.isChecked) {
@@ -96,6 +111,11 @@ class ShareProtocolActivity
 
         horizontalLayout.addView(
             checkBoxSSL,
+            -2,-2
+        )
+
+        horizontalLayout.addView(
+            btnLoadFile,
             -2,-2
         )
 
@@ -125,6 +145,31 @@ class ShareProtocolActivity
         )
 
         mTextQuery = mEditTextRequest!!.text.toString()
+
+        if (params[0] == "sf") {
+
+            val d = mFiles[params[1]] ?: return ByteArray(0)
+
+            val fileName = params[1].toByteArray(
+                Application.CHARSET_ASCII
+            )
+
+            val shareRequest = ShareRequestBuilder()
+                .setMethod(ShareRequestMethod(
+                    params[0]
+                ))
+                .setBody(ShareRequestBody(
+                    byteArrayOf(
+                        2,
+                        fileName.size.toByte()
+                    ) + fileName + ByteUtils.integer(
+                        d.size
+                    ) + d
+                ))
+                .build() ?: return ByteArray(0)
+
+            return shareRequest.toByteArray()
+        }
 
         val shareRequest = ShareRequestBuilder()
             .setMethod(ShareRequestMethod(
@@ -200,9 +245,7 @@ class ShareProtocolActivity
 
     }
 
-}
-
-/*override fun onActivityResult(
+    override fun onActivityResult(
         uri: Uri?
     ) {
         val activity = this
@@ -231,14 +274,18 @@ class ShareProtocolActivity
         )
 
         val fileName = if (nameIndex == -1)
-                filePath
-            else filePath.substring(
+            filePath
+        else filePath.substring(
             nameIndex+1
-            )
+        )
+
+        mFiles[fileName] = data
 
         Toast.makeText(
             activity,
             "FILE IS PREPARED $fileName",
-            Toast.LENGTH_SHORT)
-            .show()
-    }*/
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+}
